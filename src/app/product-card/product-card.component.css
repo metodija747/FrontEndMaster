@@ -1,0 +1,12 @@
+ @media (max-width: 767.98px) { .border-sm-start-none { border-left: none !important; } }
+ .spinner-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.star-rating {
+  color: #3d2105;
+}
+.mat-dialog-content {
+  overflow: auto;
+}

@@ -1,0 +1,53 @@
+.view-products-link, .view-products-text {
+  cursor: pointer;
+  color: #3d2105; /* Bootstrap primary color */
+  text-decoration: underline;
+}
+
+.dialog-container {
+  max-height: 90vh;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  background-color: #F4F1DE;
+}
+
+.pagination .page-link {
+  color: #3d2105; /* Change this to the color you want for the text */
+  background-color: #F4F1DE; /* Change this to the color you want for the button background */
+  border: 1px solid #3d2105; /* Change this to the color you want for the button border */
+}
+
+.pagination .page-item.active .page-link {
+  color: #F4F1DE; /* Change this to the color you want for the text of the active button */
+  background-color: #3d2105; /* Change this to the color you want for the background of the active button */
+  border: 1px solid #3d2105; /* Change this to the color you want for the border of the active button */
+}
+.btn-primary {
+  background-color: #3d2105; /*change this to your preferred color */
+  border-color: #3d2105; /* change this to your preferred color */
+}
+
+.btn-primary:hover {
+  background-color: #F4F1DE; /* change this to your preferred color */
+  border-color: #F4F1DE; /* change this to your preferred color */
+  color: #3d2105; /* change this to your preferred color */
+}
+.cancel-button-container button {
+  background-color: #000; /* Black background color */
+  color: #fff; /* White text color */
+  border: none; /* Remove border */
+  padding: 10px 20px; /* Add some padding */
+  cursor: pointer; /* Change cursor to pointer on hover */
+  transition: background-color 0.3s; /* Smooth transition */
+}
+
+.cancel-button-container button:hover {
+  background-color: #f4f1de; /* Secondary gray color on hover */
+  color: #3d2105; /* Text color on hover */
+}
+.cancel-button-container {
+  text-align: right; /* Aligns the button to the right */
+  padding-right: 20px; /* 20px away from the right border */
+  margin-top: 30px;
+}

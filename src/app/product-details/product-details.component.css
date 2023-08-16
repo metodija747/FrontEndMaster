@@ -1,0 +1,63 @@
+.product-image-container{display:flex;align-items:center;justify-content:center;width:100%;height:100%;object-fit:contain}
+.comments-container{display:flex;flex-direction:column;align-items:stretch;width:100%}.rating-review-select-page h3{color:#f4f1de;font-weight:700}
+.rating-review-select-page h4{color:#888;font-weight:400}
+.star-rating{color:#3d2105;height:50px;overflow:hidden}
+.form-control{border:1px solid #ccc;border-radius:5px}
+.comment-textarea{height:auto;resize:none}
+.btn-primary{background-color:#3d2105;border-color:#3d2105}
+.btn-primary:hover{background-color:#f4f1de;border-color:#f4f1de;color:#3d2105}
+.comments-header,.rating-header,.review-header{color:#3d2105;font-weight:700;margin-top:20px}
+.ratings-breakdown-container{display:flex;flex-direction:column;width:100%;margin-bottom:20px}
+.rating-item{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.progress-bar{height:20px;width:80%;background:#3d2105}
+.comment-card{background-color:#f4f1de;margin-bottom:20px;border:none;box-shadow:0 5px 15px rgba(0,0,0,.2);max-width:100%;width:100%}
+.card-body{padding:20px}.comment-text,.rating-text{color:#3d2105;margin-bottom:10px}.delete-button{position:absolute;right:10px;top:10px}
+.container{background-color:#f4f1de;max-height:80vh;overflow-y:auto;min-width:700px}.toggle-button{display:block;margin:30px auto;width:150px;height:40px}
+.pagination .page-link{color:#3d2105;background-color:#f4f1de;border:1px solid #3d2105}
+progress[value]::-webkit-progress-bar{background-color:#000}
+progress[value]::-webkit-progress-value{background-color:brown}
+progress[value]::-moz-progress-bar{background-color:brown}
+.spinner-container{display:flex;justify-content:center;align-items:center;width:100%}
+.quote::before{content:open-quote}.quote::after{content:close-quote}
+.product-card{position:relative;height:100%;overflow:hidden}
+.product-content{position:relative;width:100%;height:100%;cursor:pointer;transition:transform .5s}
+.product-content:hover{transform:scale(1.02);box-shadow:0 8px 16px 0 rgba(0,0,0,.2)}
+.product-description,.product-image{position:absolute;width:100%;height:100%;backface-visibility:hidden;transition:transform 1s}
+.product-description{transform:rotateY(180deg);padding:20px;box-sizing:border-box;font-size:24px;color:#3d2105;display:flex;justify-content:center;align-items:center;text-align:center;background-color:#f4f1de;font-family:'Times New Roman',Times,serif;font-style:italic;line-height:1.5;overflow:auto}
+.product-content:hover .product-image{transform:rotateY(180deg)}
+.product-content:hover .product-description{transform:rotateY(0)}
+.product-description,.product-image{position:absolute;width:100%;height:100%;object-fit:unset;-webkit-backface-visibility:hidden;backface-visibility:hidden;transition:transform 1s}
+.product-content{position:relative;min-height:400px;cursor:pointer;transition:transform .5s}
+.pointer-events-none {
+  pointer-events: none;
+}
+@media only screen and (max-width: 768px) {
+  .container {
+    max-height: 100vh; /* Adjust the maximum height */
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+    min-width: 100%; /* Set minimum width to 100% */
+    padding: 10px; /* Add some padding to prevent content from touching the edges */
+  }
+
+  .product-content {
+    min-height: 300px; /* Adjust the minimum height */
+  }
+}
+.cancel-button-container button {
+  background-color: #000; /* Black background color */
+  color: #fff; /* White text color */
+  border: none; /* Remove border */
+  padding: 10px 20px; /* Add some padding */
+  cursor: pointer; /* Change cursor to pointer on hover */
+  transition: background-color 0.3s; /* Smooth transition */
+}
+
+.cancel-button-container button:hover {
+  background-color: #f4f1de; /* Secondary gray color on hover */
+  color: #3d2105; /* Text color on hover */
+}
+.cancel-button-container {
+  text-align: right; /* Aligns the button to the right */
+  padding-right: 20px; /* 20px away from the right border */
+  margin-top: 30px;
+}

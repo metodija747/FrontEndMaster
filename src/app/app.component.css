@@ -1,0 +1,197 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  min-height: 100vh; /* changed from height to min-height */
+  font-family: 'Times New Roman', Times, serif;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 1rem 0;
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: center;
+  }
+  .header > * {
+    margin-bottom: 20px;
+  }
+}
+
+.header-section {
+  background-color: #3d2105;
+  color: #F4F1DE;
+  padding: 1rem;
+  border-bottom: 1px solid #F4F1DE;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center; /* Add this line */
+
+
+}
+
+.product-section {
+  background-color: #F4F1DE;
+  width: 100%;
+}
+
+.logo {
+  margin-right: 20px;
+}
+
+.category-dropdown,
+.search-input,
+.search-button,
+.cart-button,
+.auth-button {
+  margin-right: 20px;
+}
+
+.search-input {
+  flex-grow: 1;
+}
+
+.cart-button {
+  position: relative;
+  margin-right: 20px;
+}
+
+.cart-image {
+  width: 40px;
+  height: 40px;
+}
+
+.cart-dropdown {
+  position: absolute;
+  min-width: 150px;
+  background-color: #F4F1DE;
+  border: 1px solid #ccc;
+  padding: 10px;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.auth-button {
+  min-width: 100px;
+}
+
+.product-list {
+  width: 100%;
+}
+
+.btn-outline-primary {
+  color: #F4F1DE;
+  border-color: #F4F1DE;
+}
+
+.btn-outline-primary:hover {
+  color: #3d2105;
+  background-color: #F4F1DE;
+  border-color: #F4F1DE;
+}
+
+.btn-primary {
+  background-color: #3d2105; /* change this to your preferred color */
+  border-color: #3d2105; /* change this to your preferred color */
+}
+
+.btn-primary:hover {
+  background-color: #F4F1DE; /* change this to your preferred color */
+  border-color: #F4F1DE; /* change this to your preferred color */
+  color: #3d2105; /* change this to your preferred color */
+}
+.sort-buttons-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sort-buttons span {
+  padding: 8px 12px; /* Adjust this value to match the padding of the buttons */
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.sort-buttons button {
+  margin-right: 20px;
+}
+
+.sort-buttons-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.sort-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.sort-buttons > div {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.sort-buttons > div:first-child {
+  margin-right: 10px;  /* add a right margin to the first sort button group */
+}
+
+@media (max-width: 600px) {
+  .sort-buttons {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+}
+
+.footer {
+  background-color: #3d2105;
+  color: #f8f9fa;
+  padding: 20px 0;
+  text-align: center;
+}
+.footer h5 {
+  font-size: 18px; /* Adjust the font size for the headings */
+  margin-bottom: 10px;
+}
+
+.footer p,
+.footer a {
+  font-size: 16px; /* Adjust the font size for the paragraphs and links */
+  margin-bottom: 5px;
+}
+
+.footer a {
+  text-decoration: underline; /* Underline the clickable links */
+  color: #f8f9fa; /* Set the color for the links */
+}
+
+.footer a:hover {
+  text-decoration: none; /* Remove the underline on hover if desired */
+}
+
+.footer .row {
+  justify-content: space-evenly; /* Evenly space the columns */
+}
+
+
+

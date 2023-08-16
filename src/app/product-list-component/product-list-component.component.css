@@ -1,0 +1,11 @@
+.pagination .page-link {
+  color: #3d2105; /* Change this to the color you want for the text */
+  background-color: #F4F1DE; /* Change this to the color you want for the button background */
+  border: 1px solid #3d2105; /* Change this to the color you want for the button border */
+}
+
+.pagination .page-item.active .page-link {
+  color: #F4F1DE; /* Change this to the color you want for the text of the active button */
+  background-color: #3d2105; /* Change this to the color you want for the background of the active button */
+  border: 1px solid #3d2105; /* Change this to the color you want for the border of the active button */
+}

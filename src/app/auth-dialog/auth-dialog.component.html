@@ -1,0 +1,168 @@
+<div class="container py-5 h-100" class="dialog-container" [ngSwitch]="state">
+  <div class="row d-flex justify-content-center align-items-center h-100">
+    <div class="col col-xl-10">
+      <div class="card" style="border-radius: 1rem;">
+        <div class="row g-0">
+          <div class="col-md-6 col-lg-5 d-none d-md-block">
+            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/img1.webp"
+            alt="login form" class="img-fluid" style="border-radius: 1rem 0 0 1rem; height: 100%;" />
+          </div>
+          <div class="col-md-6 col-lg-7 d-flex align-items-center">
+            <div class="card-body p-4 p-lg-5 text-black">
+              <div class="d-flex align-items-center mb-3 pb-1">
+                <img src="assets/logo.png" style="width: 60%; height: auto;">
+              </div>
+              <div *ngSwitchCase="AuthDialogState.SignIn">
+                <h2 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Sign into your account</h2>
+                <form (ngSubmit)="onSignIn()">
+                  <div class="form-outline mb-4">
+                    <input type="email" id="form2Example17" class="form-control form-control-lg" [(ngModel)]="email" name="email" required #emailCtrl="ngModel" placeholder="Email" />
+                    <div *ngIf="emailCtrl.invalid && emailCtrl.touched" class="error">Email is required</div>
+                  </div>
+                  <div class="form-outline mb-4 input-with-eye-icon">
+                    <input [type]="showPassword ? 'text' : 'password'" id="form2Example27" class="form-control form-control-lg" [(ngModel)]="password" name="password" required #passwordCtrl="ngModel" placeholder="Password" />
+                    <button type="button" class="eye-icon-button" (click)="togglePasswordVisibility()"><i class="fa fa-eye"></i></button>
+                    <div *ngIf="passwordCtrl.invalid && passwordCtrl.touched" class="error">Password is required</div>
+                  </div>
+                  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+                  <div class="pt-1 mb-4">
+                    <button class="btn btn-primary btn-lg btn-block" type="submit" style="position: relative;">
+                      <span *ngIf="!isLoading">Sign In</span>
+                      <div *ngIf="isLoading">
+                        <mat-spinner diameter="35"></mat-spinner>
+                      </div>
+                    </button>
+                  </div>
+                  <a class="small text-muted" href="#!" (click)="state = AuthDialogState.ForgotPassword; $event.preventDefault()">Forgot password?</a>
+                  <p class="mb-5 pb-lg-2" style="color: #393f81;">Don't have an account? <a href="#!" (click)="state = AuthDialogState.SignUp; $event.preventDefault()" style="color: #393f81;">Register here</a></p>
+                </form>
+                <div class="cancel-button-container">
+                  <button (click)="closeDialog()" class="btn btn-secondary btn-lg btn-block">
+                    Cancel
+                  </button>
+                </div>
+              </div>
+              <div *ngSwitchCase="AuthDialogState.SignUp">
+                <h2 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Create your account</h2>
+                <form (ngSubmit)="onSignUp()">
+                  <div class="form-outline mb-4">
+                    <input type="email" id="form2Example17" class="form-control form-control-lg" [(ngModel)]="email" name="email" #emailCtrl="ngModel" placeholder="Email" required />
+                    <div *ngIf="emailCtrl.invalid && emailCtrl.touched" class="error">Email is required</div>
+                  </div>
+                  <div class="form-outline mb-4 input-with-eye-icon">
+                    <input [type]="showPassword ? 'text' : 'password'" id="form2Example27" class="form-control form-control-lg" [(ngModel)]="password" name="password" required #passwordCtrl="ngModel" placeholder="Password" />
+                    <button type="button" class="eye-icon-button" (click)="togglePasswordVisibility()"><i class="fa fa-eye"></i></button>
+                    <div *ngIf="passwordCtrl.invalid && passwordCtrl.touched" class="error">Password is required</div>
+                  </div>
+                  <div class="form-outline mb-4 input-with-eye-icon">
+                    <input [type]="showPassword2 ? 'text' : 'password'" id="form2Example37" class="form-control form-control-lg" [(ngModel)]="repeatPassword" name="repeatPassword" required #repeatPasswordCtrl="ngModel" placeholder="Repeat your password" />
+                    <button type="button" class="eye-icon-button" (click)="togglePasswordVisibility2()"><i class="fa fa-eye"></i></button>
+                    <div *ngIf="passwordCtrl.invalid && passwordCtrl.touched" class="error">Password is required</div>
+                  </div>
+                  <div *ngIf="errorMessage" class="error">
+                    <pre>{{ errorMessage }}</pre>
+                  </div>
+                  <div class="pt-1 mb-4">
+                    <button class="btn btn-primary btn-lg btn-block" type="submit" style="position: relative;">
+                      <span *ngIf="!isLoading">Sign Up</span>
+                      <div *ngIf="isLoading">
+                        <mat-spinner diameter="35"></mat-spinner>
+                      </div>
+                    </button>
+                  </div>
+                  <p class="mb-5 pb-lg-2" style="color: #393f81;">Already have an account? <a href="#!" (click)="state = AuthDialogState.SignIn; $event.preventDefault()" style="color: #393f81;">Sign in here</a></p>
+                </form>
+                <div class="cancel-button-container">
+                  <button (click)="closeDialog()" class="btn btn-secondary btn-lg btn-block">
+                    Cancel
+                  </button>
+                </div>
+              </div>
+
+              <div *ngSwitchCase="AuthDialogState.ForgotPassword">
+                <h2 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Forgot Password</h2>
+                <form (ngSubmit)="onForgotPassword($event)">
+                  <div class="form-outline mb-4">
+                    <input type="email" class="form-control form-control-lg" id="email" [(ngModel)]="email" name="email" required #emailCtrl="ngModel" placeholder="Email" />
+                    <div *ngIf="emailCtrl.invalid && emailCtrl.touched" class="error">Email is required</div>
+                  </div>
+                  <div class="pt-1 mb-4">
+                    <button class="btn btn-primary btn-lg btn-block" type="submit" style="position: relative;">
+                      <span *ngIf="!isLoading">Submit</span>
+                      <div *ngIf="isLoading">
+                        <mat-spinner diameter="35"></mat-spinner>
+                      </div>
+                    </button>
+                  </div>
+                </form>
+                <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+                <div class="cancel-button-container">
+                  <button (click)="closeDialog()" class="btn btn-secondary btn-lg btn-block">
+                    Cancel
+                  </button>
+                </div>
+              </div>
+
+              <div *ngSwitchCase="AuthDialogState.ConfirmForgotPassword">
+                <h2 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Confirm Forgot Password</h2>
+                <form (ngSubmit)="onConfirmForgotPassword()">
+                  <div class="form-outline mb-4">
+                    <input type="email" class="form-control form-control-lg" id="email" [(ngModel)]="email" name="email" required #emailCtrl="ngModel" placeholder="Email" />
+                    <div *ngIf="emailCtrl.invalid && emailCtrl.touched" class="error">Email is required</div>
+                  </div>
+                  <div class="form-outline mb-4">
+                    <input type="text" class="form-control form-control-lg" id="confirmationCode" [(ngModel)]="confirmationCode" name="confirmationCode" required #confirmationCodeCtrl="ngModel" placeholder="Confirmation Code" />
+                    <div *ngIf="confirmationCodeCtrl.invalid && confirmationCodeCtrl.touched" class="error">Confirmation code is required</div>
+                  </div>
+                  <div class="form-outline mb-4">
+                    <input type="password" class="form-control form-control-lg" id="pwd" [(ngModel)]="password" name="password" required #passwordCtrl="ngModel" placeholder="New Password" />
+                    <div *ngIf="passwordCtrl.invalid && passwordCtrl.touched" class="error">Password is required</div>
+                  </div>
+                  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+                  <div class="pt-1 mb-4">
+                    <button class="btn btn-primary btn-lg btn-block" type="submit" style="position: relative;">
+                      <span *ngIf="!isLoading">Submit</span>
+                      <div *ngIf="isLoading">
+                        <mat-spinner diameter="35"></mat-spinner>
+                      </div>
+                    </button>
+                  </div>
+                </form>
+                <div class="cancel-button-container">
+                  <button (click)="closeDialog()" class="btn btn-secondary btn-lg btn-block">
+                    Cancel
+                  </button>
+                </div>
+              </div>
+
+          <div *ngSwitchCase="AuthDialogState.DeleteAccount">
+            <h2>Delete my account</h2>
+            <form (ngSubmit)="onDeleteAccount()">
+              <div class="form-group">
+                <label for="email">Confirm deleting your account by typing your email address:</label><br>
+                <input type="email" class="form-control" id="email" [(ngModel)]="email" name="email" required #emailCtrl="ngModel"><br>
+                <div *ngIf="emailCtrl.invalid && emailCtrl.touched" class="error">Email is required</div><br>
+              </div>
+              <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+              <div *ngIf="successMessage" class="success">{{ successMessage }}</div>
+              <div class="pt-1 mb-4">
+                <button class="btn btn-primary btn-lg btn-block" type="submit" style="position: relative;">
+                  <span *ngIf="!isLoading">Delete</span>
+                  <div *ngIf="isLoading">
+                    <mat-spinner diameter="35"></mat-spinner>
+                  </div>
+                </button>
+              </div>
+            </form>
+            <div class="cancel-button-container">
+              <button (click)="closeDialog()" class="btn btn-secondary btn-lg btn-block">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

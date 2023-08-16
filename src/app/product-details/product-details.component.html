@@ -1,0 +1,121 @@
+<mat-spinner *ngIf="isLoadingOnInit" diameter="50"></mat-spinner>
+
+<div class="container py-5" *ngIf="!isLoadingOnInit">
+  <div class="card mb-3 product-card shadow-lg p-3 mb-5 bg-white rounded" style="font-family: 'Times New Roman', Times, serif;">
+    <div class="row g-0">
+        <div class="col-12 col-md-6">
+            <div class="card-image-container product-card">
+                <div class="product-content">
+                    <img [src]="product?.imageURL" class="product-image img-fluid" alt="Product image">
+                    <div class="product-description">
+                        <div class="quote">
+                            {{ product?.beautifulComment }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+        <div class="card-body">
+          <h5 class="card-title" style="color: #3d2105; font-size: 24px;">{{ product?.productName }}</h5>
+          <ngb-rating [rate]="product?.AverageRating || 0" [readonly]="true" [max]="5" class="star-rating"></ngb-rating>
+          <p class="card-text" style="color: #3d2105; font-size: 18px;">Category: {{ product?.categoryName }}</p>
+          <p class="card-text" style="color: #3d2105; font-size: 18px;">Description: {{ product?.Description }}</p>
+          <div class="d-flex flex-row align-items-center mb-1">
+            <h4 class="mb-1 me-1" style="color: #3d2105; font-size: 20px;">{{ product?.discountPrice }} €</h4>
+            <span class="text-danger"><s>{{ product?.Price }} €</s></span>
+          </div>
+          <button class="btn btn-outline-dark btn-sm mt-2 spinner-button mr-2" style="margin-right: 20px;" type="button" [class.disabled]="!authService.getIdToken()" (click)="addToCart()">
+            <span *ngIf="!isLoading">ADD TO CART</span>
+            <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+          </button>
+          <button *ngIf="isAdmin | async" class="btn btn-outline-dark btn-sm mt-2 spinner-button" type="button" (click)="modifyProduct()">
+            MODIFY PRODUCT
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+<button class="btn btn-primary toggle-button" (click)="toggleComments()">{{ showComments ? 'Hide comments' : 'Show comments' }}</button>
+<div *ngIf="showComments">
+<div class="card bg-light rounded shadow-sm p-4 mb-5">
+  <h3 class="review-header">Total Reviews: {{ totalComments }}</h3>
+  <h3 class="rating-header">Rating Breakdown</h3>
+<div class="ratings-breakdown-container">
+  <div *ngFor="let rating of [5, 4, 3, 2, 1]" class="rating-item">
+    <div>{{ rating }} Stars: ({{ ratingCounts[rating] || 0 }})</div>
+    <progress class="progress-bar" value="{{ ratingCounts[rating] || 0 }}" max="{{ totalComments }}"></progress>
+  </div>
+</div>
+</div>
+<div class="card bg-light rounded shadow-sm p-4 mb-5">
+<h3 class="comments-header">Comments</h3>
+<div class="comments-container">
+  <div class="spinner-container" *ngIf="isLoadingComments">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>  <div *ngIf="!isLoadingComments">
+    <div *ngFor="let comment of comments$ | async" class="comment-card card w-100">
+      <div class="card-body">
+      <p class="comment-text card-text">{{ comment.Comment }}</p>
+      <p class="rating-text card-text">Rating: {{ comment.Rating }}/5 <ngb-rating [(rate)]="comment.Rating" [readonly]="true" [max]="5" class="star-rating"></ngb-rating></p>
+      <button *ngIf="comment.UserId === authService.getUserIdFromToken()" (click)="deleteComment(comment)" class="delete-button btn btn-danger d-flex justify-content-center align-items-center" style="width: 40px; height: 40px;">
+        <mat-spinner *ngIf="isLoadingDelete; else deleteText" diameter="20"></mat-spinner>
+        <ng-template #deleteText>X</ng-template>
+      </button>
+    </div>
+    </div>
+  </div>
+  <div class="bg-light rounded shadow-sm p-4 mb-5 rating-review-select-page" style="width: 100%;">
+    <h3 class="mb-3 header-section" style="color: #3d2105">Share your experience</h3>
+    <form (ngSubmit)="addComment()" #commentForm="ngForm">
+      <div class="form-group">
+        <h4 class="mb-2">Rate this product</h4>
+        <ngb-rating [(rate)]="newComment.rating" [readonly]="!authService.getIdToken()" [max]="5" (blur)="validateRating()"></ngb-rating>
+        <div *ngIf="invalidRating && authService.getIdToken()" class="text-danger">Rating must be between 1 and 5.</div>
+      </div>
+      <div class="form-group mt-3">
+        <h4 class="mb-2">Leave a comment</h4>
+        <textarea [placeholder]="authService.getIdToken() ? 'Would you recommend this product to others?' : 'Sign in to add a comment'" class="form-control comment-textarea" [(ngModel)]="newComment.text" name="commentText" [readonly]="!authService.getIdToken()" [required]="authService.getIdToken()"></textarea>
+      </div>
+      <div class="form-group mt-3">
+        <button type="submit" class="btn btn-primary d-flex justify-content-center align-items-center" style="width: 150px; height: 40px;" [disabled]="commentForm.invalid || invalidRating">
+          <mat-spinner *ngIf="isLoadingSubmit; else submitText" diameter="20"></mat-spinner>
+          <ng-template #submitText>Submit</ng-template>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Pagination -->
+<nav aria-label="Page navigation">
+  <ul class="pagination justify-content-center">
+    <li class="page-item" [class.disabled]="page === 1">
+      <a class="page-link" href="#" (click)="page !== 1 && changePage(page - 1); $event.preventDefault()">Previous</a>
+    </li>
+    <li class="page-item" [class.disabled]="page === totalPages">
+      <a class="page-link" href="#" (click)="page !== totalPages && changePage(page + 1); $event.preventDefault()">Next</a>
+    </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+<div class="d-flex justify-content-center">
+  <button *ngIf="showAddToCart" [class.disabled]="!authService.getIdToken()" (click)="addToCart()" class="btn btn-primary d-flex justify-content-center align-items-center" style="width: 150px; height: 40px;">
+    <mat-spinner *ngIf="isLoading; else addCartText" diameter="20"></mat-spinner>
+    <ng-template #addCartText>Add to Cart</ng-template>
+  </button>
+</div>
+</div>
+
+<div class="cancel-button-container">
+  <button (click)="closeDialog()" class="btn btn-secondary">
+    Cancel
+  </button>
+</div>
+</div>

@@ -1,1 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* styles.css or another global stylesheet */
+.my-dialog-container {
+  background-color: #F4F1DE;
+  max-height: 80vh; /* Adjust based on your needs */
+  overflow-y: auto; /* Content is cut off if it's taller than container */
+}

@@ -1,0 +1,118 @@
+
+.btn-outline-primary {
+  color: #F4F1DE;
+  border-color: #3d2105;
+  background-color: #3d2105;
+}
+
+.btn-outline-primary:hover {
+  color: #3d2105;
+  background-color: #F4F1DE;
+  border-color: #F4F1DE;
+}
+
+.me-2-paypal{
+  width: 50%;
+  height: 50%;
+}
+
+.btn-primary {
+  background-color: #3d2105; /*change this to your preferred color */
+  border-color: #3d2105; /* change this to your preferred color */
+}
+
+.btn-primary:hover {
+  background-color: #F4F1DE; /* change this to your preferred color */
+  border-color: #F4F1DE; /* change this to your preferred color */
+  color: #3d2105; /* change this to your preferred color */
+}
+.sort-buttons-wrapper {
+  display: flex;
+  justify-content: center;
+}
+.mat-dialog-container {
+  width: 30%; /* Adjust this value to match your container size */
+  max-width: none;
+}
+.btn-sm {
+  padding: 10px 16px; /* Increase padding to make buttons larger */
+  font-size: 18px; /* Increase font size to make icons larger */
+}
+.dialog-container {
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  background-color: #F4F1DE;
+}
+
+.dialog-containering{
+  max-height: 90vh; /* adjust this value as needed */
+  overflow-y: auto;
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.gradient-custom {
+  background: -webkit-linear-gradient(left, #3d2105, #F4F1DE);
+  }
+
+  .card-custom {
+  border-bottom-left-radius: 10% 50%;
+  border-top-left-radius: 10% 50%;
+  background-color: #f8f9fa ;
+  }
+
+
+  .input-custom {
+  background-color: white ;
+  }
+
+  .white-text {
+  color: hsl(52, 0%, 98%);
+  font-weight: 100 ;
+  font-size: 14px;
+  }
+
+  .back-button {
+  background-color: hsl(52, 0%, 98%);
+  font-weight: 700;
+  color: black ;
+  margin-top: 50px ;
+  }
+
+  .pagination .page-link {
+    color: #3d2105; /* Change this to the color you want for the text */
+    background-color: #F4F1DE; /* Change this to the color you want for the button background */
+    border: 1px solid #3d2105; /* Change this to the color you want for the button border */
+  }
+
+  .pagination .page-item.active .page-link {
+    color: #F4F1DE; /* Change this to the color you want for the text of the active button */
+    background-color: #3d2105; /* Change this to the color you want for the background of the active button */
+    border: 1px solid #3d2105; /* Change this to the color you want for the border of the active button */
+  }
+  .cancel-button-container button {
+    background-color: #000; /* Black background color */
+    color: #fff; /* White text color */
+    border: none; /* Remove border */
+    padding: 10px 20px; /* Add some padding */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    transition: background-color 0.3s; /* Smooth transition */
+  }
+
+  .cancel-button-container button:hover {
+    background-color: #f4f1de; /* Secondary gray color on hover */
+    color: #3d2105; /* Text color on hover */
+  }
+  .cancel-button-container {
+    text-align: right;
+    padding-right: 20px;
+    margin-top: 30px;
+    margin-bottom: 20px; /* Add some bottom margin if needed */
+  }

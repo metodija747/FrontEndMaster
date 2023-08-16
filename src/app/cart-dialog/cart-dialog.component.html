@@ -1,0 +1,168 @@
+
+<mat-spinner *ngIf="isLoading" mode="indeterminate" diameter="50"></mat-spinner>
+<div *ngIf="!isLoading">
+<div class="spinner-container d-flex justify-content-center align-items-center"  style="background-color: #F4F1DE; font-size: 16px; color: #3d2105; max-height: 90vh; overflow-y: auto;" *ngIf="showCartView && !showCheckoutForm">
+  <!-- <mat-progress-spinner *ngIf="isLoading" mode="indeterminate"></mat-progress-spinner> -->
+  <div class="container py-5" class="dialog-container">
+    <div class="row d-flex justify-content-center my-4">
+      <div class="col-md-8">
+        <div class="card mb-4">
+          <div class="card-body">
+            <div *ngFor="let product of products">
+              <div class="row">
+                <div class="col-lg-3 col-md-12 mb-4 mb-lg-0">
+                  <div class="bg-image hover-overlay hover-zoom ripple rounded" data-mdb-ripple-color="light">
+                    <img [src]="product.imageURL" class="w-100" alt="Product image" />
+                  </div>
+                </div>
+                <div class="col-lg-5 col-md-6 mb-4 mb-lg-0">
+                  <p><strong>{{ product.productName }}</strong></p>
+                  <button type="button" class="btn btn-danger btn-sm me-1 mb-2" data-mdb-toggle="tooltip" title="Remove item" (click)="deleteProduct(product.productId)">
+                    <mat-spinner *ngIf="product.isLoadingDelete; else deleteText" diameter="20"></mat-spinner>
+                    <ng-template #deleteText><i class="fas fa-trash"></i></ng-template>
+                  </button>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
+                  <div class="d-flex mb-4" style="max-width: 200px">
+                    <button class="btn btn-primary px-2 me-2" (click)="this.decreaseQuantity(product)">
+                      <i class="fas fa-minus"></i>
+                    </button>
+                    <div class="form-outline">
+                      <input id="form1" min="0" name="quantity" [(ngModel)]="product.quantity" type="number" class="form-control" style="width: 60px;" (change)="updateQuantity(product)" (click)="$event.stopPropagation()"/>
+                      <label class="form-label" for="form1">Quantity</label>
+                    </div>
+                    <button class="btn btn-primary px-2 ms-2" (click)="this.increaseQuantity(product)">
+                      <i class="fas fa-plus"></i>
+                    </button>
+                  </div>
+                  <div class="price-container" style="display: flex; align-items: center;">
+                    <strong>Price: </strong>
+                    <span style="display: flex; align-items: center; margin-left: 5px;">
+                      <ng-container *ngIf="product.isUpdatingQuantity; else productPrice">
+                        <mat-spinner diameter="20"></mat-spinner>
+                      </ng-container>
+                      <ng-template #productPrice>{{ product.totalProductPrice }} €</ng-template>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <hr class="my-4" />
+            </div>
+          </div>
+        </div>
+        <div *ngIf="products.length > 0">
+        <div class="d-flex justify-content-center">
+          <nav aria-label="Page navigation">
+            <ul class="pagination">
+              <li class="page-item" *ngFor="let page of pages" [class.active]="currentPage === page">
+                <a class="page-link" href="#" (click)="loadCart(page); $event.preventDefault()">{{ page }}</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+      </div>
+      <div class="col-md-4 custom-class"> <!-- Adjusted from col-md-4 to col-md-6 and added custom class -->
+          <div class="card mb-4 mb-lg-0">
+            <div class="card-body">
+              <div class="total-price-container" style="display: flex; align-items: center;">
+                <strong>Total price: </strong>
+                <span style="display: flex; align-items: center; margin-left: 5px;">
+                  <ng-container *ngIf="isUpdatingTotalPrice(); else totalPrice">
+                    <mat-spinner diameter="20"></mat-spinner>
+                  </ng-container>
+                  <ng-template #totalPrice>{{ TotalPrice }} €</ng-template>
+                </span>
+              </div>
+              <button class="btn btn-outline-primary" (click)="openCheckoutForm()" [hidden]="!products.length" [disabled]="!products.length">CHECKOUT</button>
+            </div>
+          </div>
+        <div class="card mb-4 mb-lg-0">
+          <div class="card-body">
+            <p><strong>We accept</strong></p>
+            <img class="me-2" width="45px"
+              src="https://mdbcdn.b-cdn.net/wp-content/plugins/woocommerce-gateway-stripe/assets/images/visa.svg"
+              alt="Visa" />
+            <img class="me-2" width="45px"
+              src="https://mdbcdn.b-cdn.net/wp-content/plugins/woocommerce-gateway-stripe/assets/images/amex.svg"
+              alt="American Express" />
+            <img class="me-2" width="45px"
+              src="https://mdbcdn.b-cdn.net/wp-content/plugins/woocommerce-gateway-stripe/assets/images/mastercard.svg"
+              alt="Mastercard" />
+            <img class="me-2 paypal" width="45px" height="30px"
+              src="https://cdn-icons-png.flaticon.com/512/174/174861.png"
+              alt="PayPal acceptance mark" />
+          </div>
+        </div>
+        <div class="cancel-button-container">
+          <button (click)="closeDialog()" class="btn btn-secondary btn-lg btn-block">
+            Cancel
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+</div>
+
+
+
+<div class="gradient-custom" *ngIf="!showCartView && showCheckoutForm">
+  <div class="dialog-containering">
+  <div class="row mt-3 mx-3" style="margin-top:25px ;">
+    <div class="col-md-3">
+      <div style="margin-top: 50px; margin-left: 10px;" class="text-center">
+        <i id="animationDemo" class="fas fa-3x fa-shipping-fast text-white"></i>
+        <h3 class="mt-3 text-white">Checkout</h3>
+        <p class="white-text">You are 30 seconds away from completing your order!</p>
+      </div>
+      <div class="text-center">
+        <button type="button" class="btn btn-outline-primary btn-rounded back-button" (click)="goBackToCart()">Go back</button>
+      </div>
+    </div>
+    <div class="col-md-9 justify-content-center">
+      <div class="card card-custom pb-4">
+        <div class="card-body mt-0 mx-5">
+          <div class="text-center mb-3 pb-2 mt-3">
+            <h4 style="color: #495057 ; font-size: xx-large;">Delivery Details</h4>
+          </div>
+          <form [formGroup]="checkoutForm" (ngSubmit)="checkout()">
+            <div class="form-outline mb-4">
+              <input type="email" id="email" class="form-control input-custom" formControlName="email" placeholder="Email"/>
+              <div *ngIf="checkoutForm.get('email')?.invalid && checkoutForm.get('email')?.touched" style="color: red">Please enter a valid email.</div>
+            </div>
+            <div class="form-outline mb-4">
+              <input type="text" id="name" class="form-control input-custom" formControlName="name" placeholder="Name"/>
+              <div *ngIf="checkoutForm.get('name')?.invalid && checkoutForm.get('name')?.touched" style="color: red">Please enter a valid name.</div>
+            </div>
+            <div class="form-outline mb-4">
+              <input type="text" id="surname" class="form-control input-custom" formControlName="surname" placeholder="Surname"/>
+              <div *ngIf="checkoutForm.get('surname')?.invalid && checkoutForm.get('surname')?.touched" style="color: red">Please enter a valid surname.</div>
+            </div>
+            <div class="form-outline mb-4">
+              <input type="text" id="address" class="form-control input-custom" formControlName="address" placeholder="Address"/>
+              <div *ngIf="checkoutForm.get('address')?.invalid && checkoutForm.get('address')?.touched" style="color: red">Please enter a valid address.</div>
+            </div>
+            <div class="form-outline mb-4">
+              <input type="tel" id="telNumber" class="form-control input-custom" formControlName="telNumber" placeholder="Telephone Number"/>
+              <div *ngIf="checkoutForm.get('telNumber')?.invalid && checkoutForm.get('telNumber')?.touched" style="color: red">Please enter a valid telephone number.</div>
+            </div>
+            <div class="float-end ">
+              <button type="submit" class="btn btn-primary btn-rounded" [disabled]="checkoutForm.invalid">
+                <span *ngIf="!isPayLoading">PAY</span>
+                <mat-progress-spinner *ngIf="isPayLoading" mode="indeterminate" diameter="20"></mat-progress-spinner>
+              </button>
+            </div>
+          </form>
+        </div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+

@@ -1,0 +1,97 @@
+
+.btn-outline-primary {
+  color: #F4F1DE;
+  border-color: #3d2105;
+  background-color: #3d2105;
+}
+
+.btn-outline-primary:hover {
+  color: #3d2105;
+  background-color: #F4F1DE;
+  border-color: #F4F1DE;
+}
+
+.btn-primary {
+  background-color: #3d2105; /*change this to your preferred color */
+  border-color: #3d2105; /* change this to your preferred color */
+}
+
+.btn-primary:hover {
+  background-color: #F4F1DE; /* change this to your preferred color */
+  border-color: #F4F1DE; /* change this to your preferred color */
+  color: #3d2105; /* change this to your preferred color */
+}
+.sort-buttons-wrapper {
+  display: flex;
+  justify-content: center;
+}
+.btn-sm {
+  padding: 10px 16px; /* Increase padding to make buttons larger */
+  font-size: 18px; /* Increase font size to make icons larger */
+}
+.dialog-container {
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  background-color: #F4F1DE;
+  min-width: 700px; /* Adjust this value as needed */
+
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+  .card-custom {
+  border-bottom-left-radius: 10% 50%;
+  border-top-left-radius: 10% 50%;
+  background-color: #f8f9fa ;
+  /* width: 100%; Adjust as needed */
+
+  }
+
+  .input-custom {
+  background-color: white ;
+  }
+
+  .white-text {
+  color: hsl(52, 0%, 98%);
+  font-weight: 100 ;
+  font-size: 14px;
+  }
+
+
+  @media only screen and (max-width: 768px) {
+    .dialog-container {
+      max-height: 100vh; /* Adjust the maximum height */
+      overflow-x: hidden; /* Prevent horizontal scrolling */
+      min-width: 100%; /* Set minimum width to 100% */
+      padding: 10px; /* Add some padding to prevent content from touching the edges */
+    }
+
+    .product-content {
+      min-height: 300px; /* Adjust the minimum height */
+    }
+  }
+  .cancel-button-container button {
+    background-color: #000; /* Black background color */
+    color: #fff; /* White text color */
+    border: none; /* Remove border */
+    padding: 10px 20px; /* Add some padding */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    transition: background-color 0.3s; /* Smooth transition */
+  }
+
+  .cancel-button-container button:hover {
+    background-color: #f4f1de; /* Secondary gray color on hover */
+    color: #3d2105; /* Text color on hover */
+  }
+  .cancel-button-container {
+    text-align: right; /* Aligns the button to the right */
+    padding-right: 20px; /* 20px away from the right border */
+    margin-top: 30px;
+  }

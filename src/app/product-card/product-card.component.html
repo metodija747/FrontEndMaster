@@ -1,0 +1,44 @@
+<div class="card shadow-0 border rounded-3" style="font-family: 'Times New Roman', Times, serif;">
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-12 col-lg-3 col-xl-3 mb-4 mb-lg-0">
+        <div class="bg-image hover-zoom ripple rounded ripple-surface">
+          <img [src]="product.imageURL" class="w-100" alt="Product image" />
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-6 col-xl-6">
+        <h5 style="color: #3d2105; font-size: 20px;">{{ product.productName }}</h5>
+        <div class="d-flex flex-row">
+          <div class="text-danger mb-1 me-2">
+            <ngb-rating [(rate)]="averageRating" [readonly]="true" [max]="5" class="star-rating"></ngb-rating>
+          </div>
+          <span>{{ product.commentsCount }}</span>
+        </div>
+        <div class="mt-1 mb-0 text-muted small">
+          <span>• {{ product.categoryName }}</span>
+        </div>
+        <p class="text-truncate mb-4 mb-md-0" style="color: #3d2105;">
+          {{ product.Description }}
+        </p>
+      </div>
+      <div class="col-md-6 col-lg-3 col-xl-3 border-sm-start-none border-start">
+        <div class="d-flex flex-row align-items-center mb-1">
+          <h4 class="mb-1 me-1" style="color: #3d2105; font-size: 20px;">{{ product.discountPrice }} €</h4>
+          <span class="text-danger"><s>{{ product.Price }} €</s></span>
+        </div>
+        <h6 class="text-success" style="font-size: 1.2em;">Free shipping</h6>
+        <div class="d-flex flex-column mt-4">
+          <button class="btn btn-sm" type="button" style="background-color: #8b4513; color: #fff;" (click)="openProductDetailsDialog()">DETAILS</button>
+          <button class="btn btn-outline-dark btn-sm mt-2 spinner-button" type="button" [class.disabled]="!authService.getIdToken()" (click)="addToCart($event)">
+            <span *ngIf="!isLoading">ADD TO CART</span>
+            <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+          </button>
+          <button *ngIf="isAdmin | async" class="btn btn-danger btn-sm mt-2 spinner-button" type="button" (click)="deleteProduct()">
+            <span *ngIf="!isDeleting">DELETE PRODUCT</span>
+            <mat-spinner *ngIf="isDeleting" diameter="20"></mat-spinner>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

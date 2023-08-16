@@ -1,0 +1,68 @@
+<mat-spinner *ngIf="isLoading" mode="indeterminate" diameter="50"></mat-spinner>
+<div *ngIf="!isLoading">
+<div class="container py-5" style="background-color: #F4F1DE; font-size: 16px; color: #3d2105; max-height: 90vh; overflow-y: auto;">
+<div class="modal-body">
+  <!-- <mat-progress-spinner *ngIf="isLoading" mode="indeterminate"></mat-progress-spinner> -->
+  <div class="modal-header">
+    <h5 class="modal-title" style="font-size: xx-large;">My Orders</h5>
+  </div>
+  <table class="table table-borderless main">
+    <thead>
+      <tr class="head">
+        <th scope="col">Timestamp</th>
+        <th scope="col">Customer</th>
+        <th scope="col">Email</th> <!-- Add this line -->
+        <th scope="col">Address</th> <!-- Add this line -->
+        <th scope="col">TelNumber</th> <!-- Add this line -->
+        <th scope="col">Total</th>
+        <th scope="col">Status</th>
+        <th scope="col">Products</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="rounded bg-white" *ngFor="let order of orders">
+        <td>{{order.TimeStamp}}</td>
+        <td>
+          <span class="ml-2">{{order.Name + ' ' + order.Surname}}</span>
+        </td>
+        <td>{{order.Email}}</td> <!-- Add this line -->
+        <td>{{order.Address}}</td> <!-- Add this line -->
+        <td>{{order.TelNumber}}</td> <!-- Add this line -->
+        <td>{{order.TotalPrice}}</td>
+        <td>{{order.OrderStatus}}</td>
+        <td>
+          <a href="#" class="view-products-link" (click)="order.isCollapsed = !order.isCollapsed; $event.preventDefault()">
+            {{order.isCollapsed ? 'View Products' : 'Hide Products'}}
+          </a>
+          <div [ngbCollapse]="order.isCollapsed">
+            <ul>
+              <li *ngFor="let product of order.products">
+                {{product.productName}} (Quantity: {{product.quantity}})
+              </li>
+            </ul>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+<!-- Pagination -->
+<nav aria-label="Page navigation">
+  <ul class="pagination justify-content-center">
+    <li class="page-item" [class.disabled]="page === 1">
+      <a class="page-link" href="#" (click)="getOrders(page - 1); $event.preventDefault()">Previous</a>
+    </li>
+    <li class="page-item" [class.disabled]="page === totalPages || !orders?.length">
+      <a class="page-link" href="#" (click)="getOrders(page + 1); $event.preventDefault()">Next</a>
+    </li>
+  </ul>
+</nav>
+</div>
+<div class="cancel-button-container">
+  <button (click)="closeDialog()" class="btn btn-secondary btn-lg btn-block">
+    Cancel
+  </button>
+</div>
+</div>
+</div>
+

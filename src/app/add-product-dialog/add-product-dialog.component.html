@@ -1,0 +1,69 @@
+<!-- add-product-dialog.component.html -->
+<div class="container py-5" class="dialog-container">
+  <div class="gradient-custom dialog-container">
+    <div class="row d-flex justify-content-center my-4">
+      <div class="col-md-8">
+          <div class="card-body">
+        <h4 style="color: #495057 ; font-size: xx-large;">Product Details</h4>
+        <form [formGroup]="addProductForm" (ngSubmit)="addProduct()" style="width: 100%;">
+        <div class="form-outline mb-4">
+          <input type="text" id="productName" class="form-control input-custom" formControlName="productName" placeholder="Product Name"/>
+          <div *ngIf="addProductForm.get('productName')?.invalid && addProductForm.get('productName')?.touched" style="color: red">Please enter a valid product name.</div>
+        </div>
+
+        <div class="form-outline mb-4">
+          <select id="categoryName" class="form-control input-custom" formControlName="categoryName">
+            <option value="" disabled selected>Choose Category</option>
+            <option value="Jewelry">Jewelry</option>
+            <option value="Timepiece">Timepiece</option>
+            <option value="Games">Games</option>
+          </select>
+
+          <div *ngIf="addProductForm.get('categoryName')?.invalid && addProductForm.get('categoryName')?.touched" style="color: red">Please select a valid category.</div>
+        </div>
+
+        <div class="form-outline mb-4">
+          <input type="text" id="imageURL" class="form-control input-custom" formControlName="imageURL" placeholder="Image URL"/>
+          <div *ngIf="addProductForm.get('imageURL')?.invalid && addProductForm.get('imageURL')?.touched" style="color: red">Please enter a valid image URL.</div>
+        </div>
+
+        <div class="form-outline mb-4">
+          <input type="number" id="price" class="form-control input-custom" formControlName="price" placeholder="Price" min="0"/>
+          <div *ngIf="addProductForm.get('price')?.invalid && addProductForm.get('price')?.touched" style="color: red">Please enter a valid price.</div>
+        </div>
+
+        <div class="form-outline mb-4">
+          <input type="number" id="discountPrice" class="form-control input-custom" formControlName="discountPrice" placeholder="Discount Price" min="0"/>
+          <div *ngIf="addProductForm.get('discountPrice')?.invalid && addProductForm.get('discountPrice')?.touched" style="color: red">Please enter a valid discount price.</div>
+          <div *ngIf="addProductForm.hasError('priceDiscount')" style="color: red">Discount price cannot be greater or equal than the price.</div>
+        </div>
+
+        <div class="form-outline mb-4">
+          <textarea id="description" class="form-control input-custom" formControlName="description" placeholder="Description" rows="4" style="resize: none; overflow-y: auto;"></textarea>
+          <div *ngIf="addProductForm.get('description')?.invalid && addProductForm.get('description')?.touched" style="color: red">Please enter a valid description.</div>
+        </div>
+
+        <div class="form-outline mb-4">
+          <textarea id="beautifulComment" class="form-control input-custom" formControlName="beautifulComment" placeholder="Beautiful Comment" rows="4" style="resize: none; overflow-y: auto;"></textarea>
+          <div *ngIf="addProductForm.get('beautifulComment')?.invalid && addProductForm.get('beautifulComment')?.touched" style="color: red">Please enter a valid beautiful comment.</div>
+        </div>
+
+        <div class="text-center"> <!-- Add this div with class text-center -->
+          <button type="submit" class="btn btn-primary btn-lg btn-block" [disabled]="addProductForm.invalid || (addProductForm.get('price')?.value ?? 0) <= (addProductForm.get('discountPrice')?.value ?? 0)">
+            <span *ngIf="!isAddLoading">Add</span>
+            <mat-progress-spinner *ngIf="isAddLoading" mode="indeterminate" diameter="20"></mat-progress-spinner>
+          </button>
+        </div>
+      </form>
+      <div class="cancel-button-container">
+        <button (click)="closeDialog()" class="btn btn-secondary btn-lg btn-block">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  </div>
+</div>
+</div>
+
