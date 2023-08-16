@@ -18,14 +18,17 @@ jobs:
       with:
         node-version: '14'
 
+    - name: Install Angular CLI
+      run: npm install -g @angular/cli
+
     - name: Install dependencies
       run: npm install
 
-    - name: Build Angular app
-      run: ng build
+    - name: Build Angular app for production
+      run: ng build --prod
 
     - name: Deploy to S3
-      uses: jakejarvis/s3-sync-action@master
+      uses: jakejarvis/s3-sync-action@v0.5.1
       with:
         args: --acl public-read --follow-symlinks --delete
       env:
