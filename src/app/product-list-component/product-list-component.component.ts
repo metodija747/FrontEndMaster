@@ -38,7 +38,12 @@ export class ProductListComponent implements OnInit, OnChanges {
   public getProducts(page: number = 1): void {
     this.currentPage = page;
     this.isLoading = true;
-    const url = 'https://031a-89-205-125-141.ngrok-free.app/products';
+
+    // Base URL
+    const baseUrl = 'https://8yuhxuxhob.execute-api.us-east-1.amazonaws.com/Stage/catalog';
+
+    // Construct the URL with query parameters
+    const url = `${baseUrl}?category=${this.category}&searchTerm=${this.searchTerm}&sortBy=${this.sortBy}&sortOrder=${this.sortOrder}&page=${page}`;
 
     console.log('Sending request with parameters:', {
       category: this.category,
@@ -63,5 +68,6 @@ export class ProductListComponent implements OnInit, OnChanges {
       console.error('There was an error!', error);
     });
 }
+
 }
 
