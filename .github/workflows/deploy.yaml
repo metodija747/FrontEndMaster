@@ -24,6 +24,10 @@ jobs:
     - name: Install dependencies
       run: npm install
 
+    # Add this step to install @angular/localize
+    - name: Install @angular/localize
+      run: npm install @angular/localize --save
+
     - name: Build Angular app for production
       run: ng build
 
