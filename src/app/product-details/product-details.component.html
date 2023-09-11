@@ -72,7 +72,7 @@
     <form (ngSubmit)="addComment()" #commentForm="ngForm">
       <div class="form-group">
         <h4 class="mb-2">Rate this product</h4>
-        <ngb-rating [(rate)]="newComment.rating" [readonly]="!authService.getIdToken()" [max]="5" (blur)="validateRating()"></ngb-rating>
+        <ngb-rating id="productRating" [(rate)]="newComment.rating" [readonly]="!authService.getIdToken()" [max]="5" (blur)="validateRating()"></ngb-rating>
         <div *ngIf="invalidRating && authService.getIdToken()" class="text-danger">Rating must be between 1 and 5.</div>
       </div>
       <div class="form-group mt-3">

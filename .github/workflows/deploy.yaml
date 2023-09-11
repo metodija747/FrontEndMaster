@@ -1,4 +1,4 @@
-name: Build and Deploy to S3
+name: Build, Test and Deploy to S3
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
     - name: Use Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '16.14'  # Updated to Node.js v16.14
+        node-version: '16.14'
 
     - name: Install Angular CLI
       run: npm install -g @angular/cli
@@ -24,12 +24,17 @@ jobs:
     - name: Install dependencies
       run: npm install
 
-    # Add this step to install @angular/localize
     - name: Install @angular/localize
       run: npm install @angular/localize@16.1.4 --save
 
     - name: Build Angular app for production
       run: ng build
+
+    - name: Install Cypress
+      run: npm install cypress
+
+    - name: Run Cypress Tests
+      run: npx cypress run
 
     - name: Deploy to S3
       uses: jakejarvis/s3-sync-action@v0.5.1

@@ -19,7 +19,7 @@ interface CartProductWithLoading extends CartProduct {
   styleUrls: ['./cart-dialog.component.css'],
 })
 export class CartDialogComponent implements OnInit {
-  TotalPrice: number = 0;
+  TotalPrice: number = 0.00 as number;
   showCheckoutForm = false;
   showProductDetails = false;
   selectedProduct: CartProduct | null = null;
@@ -37,7 +37,7 @@ export class CartDialogComponent implements OnInit {
     name: ['', [Validators.required, Validators.pattern('[a-zA-Z ]*')]],
     surname: ['', [Validators.required, Validators.pattern('[a-zA-Z ]*')]],
     address: ['', Validators.required],
-    telNumber: ['', [Validators.required, Validators.pattern('^((\\+91-?)|0)?[0-9]{9}$')]] // simple pattern for 10 digit number
+    telNumber: ['', [Validators.required, Validators.pattern('^((\\+91-?)|0)?[0-9]{9}$')]] // simple pattern for 9 digit number
   });
   isLoading = false;
   isPayLoading = false;
@@ -118,7 +118,7 @@ loadCart(page: number = 1): void {
     console.log(response);
     this.products = response.products;
     this.pages = Array.from({ length: response.totalPages }, (_, i) => i + 1);
-    this.TotalPrice = response.totalPrice;
+    this.TotalPrice = Number(parseFloat(response.totalPrice).toFixed(2));
     this.getProductsDetails();
   },
   error => {
@@ -143,7 +143,7 @@ getProductsDetails(): void {
       product.imageURL = data.imageURL;
       product.Price = data.Price;
       product.productName = data.productName;
-      product.totalProductPrice = product.quantity * product.Price;
+      product.totalProductPrice = parseFloat((product.quantity * product.Price).toFixed(2));
       console.log(product)
       this.isLoading = false;
     });
@@ -157,14 +157,14 @@ updateQuantity(product: CartProduct): void {
   this.http.post(`${this.baseUrl}cart/`,
     {productId: String(product.productId), quantity: String(product.quantity) },
     { headers }).subscribe((updatedItem: any) => {
-      this.TotalPrice = updatedItem.TotalPrice;
+      this.TotalPrice = Number(parseFloat(updatedItem.TotalPrice).toFixed(2));
       product.isUpdatingQuantity = false; // End loading
       // Find the updated product in the products array and fetch its details
       const updatedProduct = this.products.find(p => p.productId === product.productId);
       if (updatedProduct) {
         this.http.get(`${this.baseUrl}catalog/${updatedProduct.productId}`).subscribe((data: any) => {
           updatedProduct.Price = data.Price;
-          updatedProduct.totalProductPrice = Number(updatedProduct.quantity) * Number(updatedProduct.Price);
+          updatedProduct.totalProductPrice = parseFloat((Number(updatedProduct.quantity) * Number(updatedProduct.Price)).toFixed(2));
         });
       }
       this.cdr.detectChanges();
@@ -186,7 +186,7 @@ deleteProduct(productId: string): void {
     this.http.delete(`${this.baseUrl}cart/${productId}`, { headers, observe: 'response' }).subscribe((response: any) => {
       this.products = this.products.filter((product: any) => product.productId !== productId);
       const updatedCart = response.body;
-      this.TotalPrice = updatedCart.TotalPrice;
+      this.TotalPrice = Number(parseFloat(updatedCart.TotalPrice).toFixed(2));;
       product.isLoadingDelete = false;  // End loading
       this.loadCart();
       this.snackBar.open('Product deleted from cart successfully', 'Close', {
