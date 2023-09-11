@@ -42,10 +42,8 @@ export class AppComponent {
     ).subscribe(searchTerm => {
       this.searchTerm = searchTerm;
       this.productListComponent.getProducts();
-      this.cartSize();
     });
   }
-
 
   constructor(public dialog: MatDialog, public authService: AuthService, private http: HttpClient, private snackBar: MatSnackBar
     ) {
@@ -56,17 +54,6 @@ export class AppComponent {
   openDialog(state: AuthDialogState) {
     const dialogRef = this.dialog.open(AuthDialogComponent, {
       data: { state },
-    });
-  }
-
-  cartSize() {
-    const idToken = this.authService.getIdToken();
-    const headers = { 'Authorization': idToken };
-    this.http.get('https://8yuhxuxhob.execute-api.us-east-1.amazonaws.com/Stage/cart', { headers }).subscribe((data: any) => {
-      const cart = data[0];
-      console.log(cart)
-      this.products = JSON.parse(cart.products);
-      this.cartItemCount = this.products.length;
     });
   }
 

@@ -5,6 +5,7 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
+  readonly baseUrl = 'https://5mtylqf88k.execute-api.us-east-1.amazonaws.com/Stage/';
   private idTokenSubject = new BehaviorSubject<string>(localStorage.getItem('idToken') || '');
   private isAdminSubject = new BehaviorSubject<boolean>(JSON.parse(localStorage.getItem('isAdmin') || 'false'));
   idToken$ = this.idTokenSubject.asObservable();

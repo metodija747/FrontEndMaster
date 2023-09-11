@@ -46,7 +46,7 @@ export class CartDialogComponent implements OnInit {
   ngOnInit(): void {
     this.loadCart();
   }
-
+  baseUrl = `${this.authService.baseUrl}`;
   openCheckoutForm() {
     this.showCheckoutForm = true;
     this.showCartView = false;
@@ -79,7 +79,7 @@ export class CartDialogComponent implements OnInit {
       orderList: JSON.stringify(orderList),
       totalPrice: this.TotalPrice
     };
-    this.http.post('https://8yuhxuxhob.execute-api.us-east-1.amazonaws.com/Stage/checkout', body, { headers }).subscribe((response: any) => {
+    this.http.post(`${this.baseUrl}checkout`, body, { headers }).subscribe((response: any) => {
       // Handle the response
       console.log(response);
       this.showCheckoutForm = false;
@@ -99,7 +99,7 @@ export class CartDialogComponent implements OnInit {
         horizontalPosition: 'left'
       });
       this.isPayLoading = false; // End loading
-      if (error.status === 500) {
+      if (error.status === 403) {
         this.authService.clearIdToken();
         location.reload();
       }
@@ -114,7 +114,8 @@ loadCart(page: number = 1): void {
   this.isLoading = true;
   const idToken = this.authService.getIdToken();
   const headers = { 'Authorization': idToken };
-  this.http.get(`https://8yuhxuxhob.execute-api.us-east-1.amazonaws.com/Stage/cart?page=${page}`, { headers }).subscribe((response: any) => {
+  this.http.get(`${this.baseUrl}cart?page=${page}`, { headers }).subscribe((response: any) => {
+    console.log(response);
     this.products = response.products;
     this.pages = Array.from({ length: response.totalPages }, (_, i) => i + 1);
     this.TotalPrice = response.totalPrice;
@@ -123,7 +124,7 @@ loadCart(page: number = 1): void {
   error => {
     console.error('There was an error!', error);
     this.isLoading = false;
-    if (error.status === 500) {
+    if (error.status === 403) {
       this.authService.clearIdToken();
       location.reload();
     }
@@ -131,10 +132,14 @@ loadCart(page: number = 1): void {
 }
 
 getProductsDetails(): void {
+    if (!this.products || this.products.length === 0) {
+    this.isLoading = false;
+    return;
+  }
   this.products.forEach((product: any) => {
     const headers = { 'Authorization': "Bearer " + this.authService.getIdToken() };
     console.log(headers)
-    this.http.get(`https://8yuhxuxhob.execute-api.us-east-1.amazonaws.com/Stage/catalog/${product.productId}`, { headers }).subscribe((data: any) => {
+    this.http.get(`${this.baseUrl}catalog/${product.productId}`, { headers }).subscribe((data: any) => {
       product.imageURL = data.imageURL;
       product.Price = data.Price;
       product.productName = data.productName;
@@ -149,7 +154,7 @@ updateQuantity(product: CartProduct): void {
   product.isUpdatingQuantity = true; // Start loading
   const idToken = this.authService.getIdToken();
   const headers = { 'Authorization': idToken };
-  this.http.post(`https://8yuhxuxhob.execute-api.us-east-1.amazonaws.com/Stage/cart/`,
+  this.http.post(`${this.baseUrl}cart/`,
     {productId: String(product.productId), quantity: String(product.quantity) },
     { headers }).subscribe((updatedItem: any) => {
       this.TotalPrice = updatedItem.TotalPrice;
@@ -157,7 +162,7 @@ updateQuantity(product: CartProduct): void {
       // Find the updated product in the products array and fetch its details
       const updatedProduct = this.products.find(p => p.productId === product.productId);
       if (updatedProduct) {
-        this.http.get(`https://8yuhxuxhob.execute-api.us-east-1.amazonaws.com/Stage/catalog/${updatedProduct.productId}`).subscribe((data: any) => {
+        this.http.get(`${this.baseUrl}catalog/${updatedProduct.productId}`).subscribe((data: any) => {
           updatedProduct.Price = data.Price;
           updatedProduct.totalProductPrice = Number(updatedProduct.quantity) * Number(updatedProduct.Price);
         });
@@ -166,7 +171,7 @@ updateQuantity(product: CartProduct): void {
     }, error => {
       console.error('There was an error!', error);
       product.isUpdatingQuantity = false; // End loading
-      if (error.status === 500) {
+      if (error.status === 403) {
         this.authService.clearIdToken();
         location.reload();
       }});
@@ -178,7 +183,7 @@ deleteProduct(productId: string): void {
     product.isLoadingDelete = true;  // Start loading
     const idToken = this.authService.getIdToken();
     const headers = { 'Authorization': idToken };
-    this.http.delete(`https://8yuhxuxhob.execute-api.us-east-1.amazonaws.com/Stage/cart/${productId}`, { headers, observe: 'response' }).subscribe((response: any) => {
+    this.http.delete(`${this.baseUrl}cart/${productId}`, { headers, observe: 'response' }).subscribe((response: any) => {
       this.products = this.products.filter((product: any) => product.productId !== productId);
       const updatedCart = response.body;
       this.TotalPrice = updatedCart.TotalPrice;
@@ -198,7 +203,7 @@ deleteProduct(productId: string): void {
         verticalPosition: 'bottom',
         horizontalPosition: 'left'
       });
-      if (error.status === 500) {
+      if (error.status === 403) {
         this.authService.clearIdToken();
         location.reload();
       }

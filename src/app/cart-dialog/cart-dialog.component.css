@@ -41,7 +41,8 @@
 .dialog-container {
   max-height: 90vh;
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: auto;
+  min-width: 400px;
   box-sizing: border-box;
   background-color: #F4F1DE;
 }

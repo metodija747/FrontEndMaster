@@ -20,7 +20,7 @@ export class OrdersDialogComponentComponent implements OnInit {
     private http: HttpClient,
     private authService: AuthService
   ) {}
-
+  baseUrl = `${this.authService.baseUrl}`;
   ngOnInit(): void {
     this.getOrders(this.page);
   }
@@ -30,7 +30,7 @@ export class OrdersDialogComponentComponent implements OnInit {
     this.page = page; // Add this line
     const idToken = this.authService.getIdToken();
     const headers = { 'Authorization': idToken };
-    this.http.get(` https://8yuhxuxhob.execute-api.us-east-1.amazonaws.com/Stage/getOrders?page=${page}&pageSize=5`, { headers }).subscribe((response: any) => {
+    this.http.get(`${this.baseUrl}getOrders?page=${page}&pageSize=5`, { headers }).subscribe((response: any) => {
       this.orders = response.orders;
       this.orders.forEach((order:any) => {
         order.isCollapsed = true;  // Add this line

@@ -56,20 +56,20 @@ export class AuthDialogComponent implements OnInit {
   ngOnInit() {
     this.state = this.data.state;
   }
-
+  baseUrl = `${this.authService.baseUrl}`;
   onSignIn() {
     if (!this.email || !this.password || !this.isValidUsername(this.email) || !this.isValidPassword(this.password)) {
       this.errorMessage = 'Invalid email';
       return;
     }
     this.isLoading = true;
-    this.http.post<any>('https://8yuhxuxhob.execute-api.us-east-1.amazonaws.com/Stage/sign-in', {
-      username: this.email,
+    this.http.post<any>(`${this.baseUrl}sign-in`, {
+      email: this.email,
       password: this.password
     }).pipe(
       catchError(error => {
         console.error('There was an error during the sign in process', error);
-        this.errorMessage = error.error; // Set the error message
+        this.errorMessage = error.error;
         this.isLoading = false;
         return throwError(error);
       })
@@ -112,7 +112,7 @@ export class AuthDialogComponent implements OnInit {
     }
 
     this.isLoading = true;
-    this.http.post('https://8yuhxuxhob.execute-api.us-east-1.amazonaws.com/Stage/sign-up', {
+    this.http.post(`${this.baseUrl}sign-up`, {
       email: this.email,
       password: this.password
     }).pipe(
@@ -145,8 +145,8 @@ export class AuthDialogComponent implements OnInit {
     }
     event.preventDefault();
     this.isLoading = true;
-    this.http.post('https://8yuhxuxhob.execute-api.us-east-1.amazonaws.com/Stage/forgot-password', {
-      username: this.email
+    this.http.post(`${this.baseUrl}forgot-password`, {
+      email: this.email
     }).pipe(
       catchError(error => {
         console.error('There was an error during the forgot password process', error);
@@ -169,8 +169,8 @@ export class AuthDialogComponent implements OnInit {
 
   onConfirmForgotPassword() {
     this.isLoading = true;
-    this.http.post('https://8yuhxuxhob.execute-api.us-east-1.amazonaws.com/Stage/confirm-forgot-password', {
-      username: this.email,
+    this.http.post(`${this.baseUrl}confirm-forgot-password`, {
+      email: this.email,
       confirmationCode: this.confirmationCode,
       newPassword: this.password
     }).pipe(
@@ -201,7 +201,7 @@ export class AuthDialogComponent implements OnInit {
     }
     this.isLoading = true;
     const headers = new HttpHeaders().set('Authorization', this.authService.getIdToken());
-    this.http.delete(`https://8yuhxuxhob.execute-api.us-east-1.amazonaws.com/Stage/users/${this.email}`, { headers, observe: 'response' }).pipe(
+    this.http.delete(`${this.baseUrl}users/${this.email}`, { headers, observe: 'response' }).pipe(
       catchError((error: HttpErrorResponse) => {
         console.error('There was an error during the delete account process', error);
         if (error.status === 400 && error.error.includes('Failed to delete user because it does not exist.')) {

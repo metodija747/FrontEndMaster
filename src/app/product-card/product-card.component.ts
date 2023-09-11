@@ -25,7 +25,7 @@ export class ProductCardComponent implements OnInit  {
     this.isAdmin = this.authService.isAdmin$; // subscribe to the isAdmin$ observable from AuthService
 
   }
-
+  baseUrl = `${this.authService.baseUrl}`;
   ngOnInit(): void {
     this.averageRating = this.product.AverageRating;
   }
@@ -33,7 +33,7 @@ export class ProductCardComponent implements OnInit  {
   addToCart(event: Event): void {
     event.stopPropagation();
     this.isLoading = true; // Set isLoading to true when the method is called
-    const url = 'https://8yuhxuxhob.execute-api.us-east-1.amazonaws.com/Stage/cart';  // <-- Replace with your actual API Gateway URL
+    const url = `${this.baseUrl}cart`;  // <-- Replace with your actual API Gateway URL
     const headers = { 'Authorization': this.authService.getIdToken() };
     const body = { productId: this.product.productId, quantity: "1" };
     this.http.post(url, body, { headers }).subscribe({
@@ -78,7 +78,7 @@ export class ProductCardComponent implements OnInit  {
     dialogRef.afterClosed().subscribe(result => {
       if (result) { // if the result is true (user clicked "Yes")
         this.isDeleting = true; // Set isDeleting to true when delete operation starts
-        const url = `https://8yuhxuxhob.execute-api.us-east-1.amazonaws.com/Stage/catalog/${this.product.productId}`;
+        const url = `${this.baseUrl}catalog/${this.product.productId}`;
         const headers = { 'Authorization': this.authService.getIdToken() };
         this.http.delete(url, { headers }).subscribe({
           next: () => {

@@ -35,6 +35,7 @@ export class ProductDetailsComponent implements OnInit   {
     this.product = data.product;
     this.showAddToCart = data.showAddToCart;
   }
+  baseUrl = `${this.authService.baseUrl}`;
   page: number = 1;  // Add this line
   totalPages: number = 1;  // Add this line
   showComments = false;
@@ -77,7 +78,9 @@ export class ProductDetailsComponent implements OnInit   {
   }
 
   getProductComments(productId: string, page: number = 1, pageSize: number = 4): Observable<any> {
-    return this.http.get(`https://8yuhxuxhob.execute-api.us-east-1.amazonaws.com/Stage/comments/${productId}?page=${page}&pageSize=${pageSize}`)
+
+
+    return this.http.get(`${this.baseUrl}comments/${productId}?page=${page}&pageSize=${pageSize}`)
       .pipe(
         map((response: any) => {
           const comments = response.comments.map((comment: any) => ({...comment}));
@@ -120,14 +123,13 @@ export class ProductDetailsComponent implements OnInit   {
       this.isLoadingSubmit = true;
       const idToken = this.authService.getIdToken();
       const headers = { 'Authorization': idToken };
-      const apiUrl = `https://8yuhxuxhob.execute-api.us-east-1.amazonaws.com/Stage/comments`;
       const commentData = {
         comment: String(this.newComment.text),
         productId: String(this.product.productId),
         rating: String(this.newComment.rating)
       };
       const addedRating = this.newComment.rating;  // Store the rating before resetting this.newComment
-      this.http.post(apiUrl, commentData, {headers})
+      this.http.post(`${this.baseUrl}comments`, commentData, {headers})
       .subscribe(
         (response: any) => {
           this.isLoadingSubmit = false;
@@ -167,7 +169,7 @@ export class ProductDetailsComponent implements OnInit   {
     this.isLoadingDelete = true;
     const idToken = this.authService.getIdToken();
     const headers = { 'Authorization': idToken };
-    this.http.delete(`https://8yuhxuxhob.execute-api.us-east-1.amazonaws.com/Stage/comments/${this.product?.productId}`, { headers })
+    this.http.delete(`${this.baseUrl}comments/${this.product?.productId}`, { headers })
       .subscribe(
         (response: any) => {
           this.isLoadingDelete = false;
@@ -207,7 +209,7 @@ export class ProductDetailsComponent implements OnInit   {
   addToCart(): void {
     if (this.product) {
       this.isLoading = true;
-        const url = 'https://8yuhxuxhob.execute-api.us-east-1.amazonaws.com/Stage/cart';
+        const url = `${this.baseUrl}cart`;
         const headers = { 'Authorization': this.authService.getIdToken() };
         const body = { productId: this.product.productId, quantity: "1" };
         this.http.post(url, body, { headers }).subscribe({

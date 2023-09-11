@@ -2,6 +2,7 @@ import { Component, OnInit, Input, OnChanges, SimpleChanges, Output, EventEmitte
 import { Product } from '../product';
 import { HttpClient } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
+import { AuthService } from '../auth-service.service';
 
 @Component({
   selector: 'app-product-list-component',
@@ -23,7 +24,7 @@ export class ProductListComponent implements OnInit, OnChanges {
   currentRangeEnd: number = 0;
   totalProducts: number = 0;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, public authService: AuthService) { }
 
   ngOnInit(): void {
     this.getProducts();
@@ -40,7 +41,7 @@ export class ProductListComponent implements OnInit, OnChanges {
     this.isLoading = true;
 
     // Base URL
-    const baseUrl = 'https://8yuhxuxhob.execute-api.us-east-1.amazonaws.com/Stage/catalog';
+    const baseUrl = `${this.authService.baseUrl}catalog`;
 
     // Construct the URL with query parameters
     const url = `${baseUrl}?category=${this.category}&searchTerm=${this.searchTerm}&sortBy=${this.sortBy}&sortOrder=${this.sortOrder}&page=${page}`;

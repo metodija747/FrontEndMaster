@@ -33,7 +33,7 @@ export class AddProductDialogComponent {
     beautifulComment: ['', Validators.required],
     discountPrice: ['']
   }, { validators: priceDiscountValidator });  // Add the custom validator here
-
+  baseUrl = `${this.authService.baseUrl}`;
   constructor(
     public dialogRef: MatDialogRef<AddProductDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
@@ -82,7 +82,7 @@ export class AddProductDialogComponent {
       };
 
       console.log(productData);
-      this.http.post('https://8yuhxuxhob.execute-api.us-east-1.amazonaws.com/Stage/catalog', productData, {headers})
+      this.http.post(`${this.baseUrl}catalog`, productData, {headers})
         .subscribe(
           response => {
             this.isAddLoading = false;
