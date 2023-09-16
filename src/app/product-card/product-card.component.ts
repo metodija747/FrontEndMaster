@@ -25,7 +25,7 @@ export class ProductCardComponent implements OnInit  {
     this.isAdmin = this.authService.isAdmin$; // subscribe to the isAdmin$ observable from AuthService
 
   }
-  baseUrl = `${this.authService.baseUrl}`;
+  baseUrl = `${this.authService.baseUrlServerless}`;
   ngOnInit(): void {
     this.averageRating = this.product.AverageRating;
   }

@@ -56,6 +56,16 @@
           </div>
         </div>
       </div>
+      <div>
+        <span>Architecture:</span>
+        <div ngbDropdown class="d-inline-block" #architectureDropdown="ngbDropdown" ngbDropdownTrigger="manual">
+          <button class="btn btn-outline-primary" id="architectureDropdown" ngbDropdownToggle ngbDropdownAnchor>{{architecture || 'Serverless'}}</button>
+          <div ngbDropdownMenu aria-labelledby="architectureDropdown">
+            <button class="dropdown-item" (click)="setArchitecture('Serverless')">Serverless</button>
+            <button class="dropdown-item" (click)="setArchitecture('Microservice')">Microservice</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

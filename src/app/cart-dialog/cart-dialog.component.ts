@@ -46,7 +46,7 @@ export class CartDialogComponent implements OnInit {
   ngOnInit(): void {
     this.loadCart();
   }
-  baseUrl = `${this.authService.baseUrl}`;
+  baseUrl = `${this.authService.baseUrlServerless}`;
   openCheckoutForm() {
     this.showCheckoutForm = true;
     this.showCartView = false;

@@ -40,11 +40,18 @@ export class ProductListComponent implements OnInit, OnChanges {
     this.currentPage = page;
     this.isLoading = true;
 
-    // Base URL
-    const baseUrl = `${this.authService.baseUrl}catalog`;
+    // Base URLs
+    const baseUrlServerless = `${this.authService.baseUrlServerless}catalog`;
+    const baseUrlMicroservice = `${this.authService.baseUrlMicroservice}products`; // Assuming you have a baseUrlMicroservice in your AuthService
+
+    // Get the current architecture from AuthService
+    const currentArchitecture = this.authService.getArchitecture();
+
+    // Choose the base URL based on the architecture
+    const chosenBaseUrl = currentArchitecture === 'Serverless' ? baseUrlServerless : baseUrlMicroservice;
 
     // Construct the URL with query parameters
-    const url = `${baseUrl}?category=${this.category}&searchTerm=${this.searchTerm}&sortBy=${this.sortBy}&sortOrder=${this.sortOrder}&page=${page}`;
+    const url = `${chosenBaseUrl}?category=${this.category}&searchTerm=${this.searchTerm}&sortBy=${this.sortBy}&sortOrder=${this.sortOrder}&page=${page}`;
 
     console.log('Sending request with parameters:', {
       category: this.category,
@@ -52,11 +59,8 @@ export class ProductListComponent implements OnInit, OnChanges {
       sortBy: this.sortBy,
       sortOrder: this.sortOrder
     });
-
-    // Create HttpHeaders instance and set the custom header
-    const headers = new HttpHeaders().set('ngrok-skip-browser-warning', 'yolo');
-
-    this.http.get<{ products: Product[], totalPages: number, currentRangeStart: number, currentRangeEnd: number, totalProducts: number }>(url, {headers:headers}).subscribe((response) => {
+    console.log(url);
+    this.http.get<{ products: Product[], totalPages: number, currentRangeStart: number, currentRangeEnd: number, totalProducts: number }>(url).subscribe((response) => {
       this.isLoading = false;
       this.currentRangeStart = response.currentRangeStart;
       this.currentRangeEnd = response.currentRangeEnd;
@@ -68,7 +72,7 @@ export class ProductListComponent implements OnInit, OnChanges {
       this.isError = true;
       console.error('There was an error!', error);
     });
-}
+  }
 
 }
 

@@ -20,7 +20,7 @@ export class OrdersDialogComponentComponent implements OnInit {
     private http: HttpClient,
     private authService: AuthService
   ) {}
-  baseUrl = `${this.authService.baseUrl}`;
+  baseUrl = `${this.authService.baseUrlServerless}`;
   ngOnInit(): void {
     this.getOrders(this.page);
   }

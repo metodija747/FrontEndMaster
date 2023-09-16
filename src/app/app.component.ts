@@ -30,6 +30,7 @@ export class AppComponent {
   searchTerm$ = new Subject<string>();
   hoverCart: boolean = false;
   cartItemCount: number = 0; // Add this line
+  architecture: string = 'Serverless';
 
 
   @ViewChild(ProductListComponent) productListComponent!: ProductListComponent;
@@ -42,6 +43,9 @@ export class AppComponent {
     ).subscribe(searchTerm => {
       this.searchTerm = searchTerm;
       this.productListComponent.getProducts();
+    });
+    this.authService.architecture$.subscribe((architecture: string) => {
+      this.architecture = architecture;
     });
   }
 
@@ -106,5 +110,9 @@ export class AppComponent {
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed');
     });
+  }
+  setArchitecture(architecture: string) {
+    this.authService.setArchitecture(architecture);
+    console.log(this.authService.getArchitecture());
   }
 }

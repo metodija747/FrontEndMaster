@@ -56,7 +56,7 @@ export class AuthDialogComponent implements OnInit {
   ngOnInit() {
     this.state = this.data.state;
   }
-  baseUrl = `${this.authService.baseUrl}`;
+  baseUrl = `${this.authService.baseUrlServerless}`;
   onSignIn() {
     if (!this.email || !this.password || !this.isValidUsername(this.email) || !this.isValidPassword(this.password)) {
       this.errorMessage = 'Invalid email';

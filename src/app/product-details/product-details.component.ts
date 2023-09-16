@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, EventEmitter, Inject, Input, OnDestroy, O
 import { HttpClient } from '@angular/common/http';
 import { CartProduct } from '../product';
 import { AuthService } from '../auth-service.service';
-import { BehaviorSubject, Observable, map } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, map, of } from 'rxjs';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AddProductDialogComponent } from '../add-product-dialog/add-product-dialog.component';
@@ -35,7 +35,11 @@ export class ProductDetailsComponent implements OnInit   {
     this.product = data.product;
     this.showAddToCart = data.showAddToCart;
   }
-  baseUrl = `${this.authService.baseUrl}`;
+  baseUrlServerless = `${this.authService.baseUrlServerless}`;
+  baseUrlMicroservice = `${this.authService.baseUrlMicroservice}`; // Assuming you have a baseUrlMicroservice in your AuthService
+  currentArchitecture = this.authService.getArchitecture();
+  chosenBaseUrl = this.currentArchitecture === 'Serverless' ? this.baseUrlServerless : this.baseUrlMicroservice;
+
   page: number = 1;  // Add this line
   totalPages: number = 1;  // Add this line
   showComments = false;
@@ -77,20 +81,33 @@ export class ProductDetailsComponent implements OnInit   {
     this.dialogRef.close();
   }
 
+
   getProductComments(productId: string, page: number = 1, pageSize: number = 4): Observable<any> {
-
-
-    return this.http.get(`${this.baseUrl}comments/${productId}?page=${page}&pageSize=${pageSize}`)
+    console.log(this.chosenBaseUrl);
+    return this.http.get(`${this.chosenBaseUrl}comments/${productId}?page=${page}&pageSize=${pageSize}`)
       .pipe(
         map((response: any) => {
-          const comments = response.comments.map((comment: any) => ({...comment}));
-          const totalPages = response.totalPages;
-          const totalComments = response.totalComments;
-          const ratingCounts = response.ratingCounts;
-          return { comments, totalPages, totalComments, ratingCounts };
+          // Check if the response has the expected properties
+          if (response && 'comments' in response && 'totalPages' in response && 'totalComments' in response && 'ratingCounts' in response) {
+            const comments = Array.isArray(response.comments) ? response.comments.map((comment: any) => ({...comment})) : [];
+            const totalPages = response.totalPages || 0;
+            const totalComments = response.totalComments || 0;
+            const ratingCounts = response.ratingCounts || {};
+            return { comments, totalPages, totalComments, ratingCounts };
+          } else {
+            // Handle unexpected response structure
+            console.error('Unexpected server response:', response);
+            return { comments: [], totalPages: 0, totalComments: 0, ratingCounts: {} };
+          }
+        }),
+        catchError(error => {
+          // Handle any errors here
+          console.error('An error occurred:', error);
+          return of({ comments: [], totalPages: 0, totalComments: 0, ratingCounts: {} });
         })
       );
   }
+
 
 
   changePage(newPage: number): void {
@@ -129,7 +146,7 @@ export class ProductDetailsComponent implements OnInit   {
         rating: String(this.newComment.rating)
       };
       const addedRating = this.newComment.rating;  // Store the rating before resetting this.newComment
-      this.http.post(`${this.baseUrl}comments`, commentData, {headers})
+      this.http.post(`${this.chosenBaseUrl}comments`, commentData, {headers})
       .subscribe(
         (response: any) => {
           this.isLoadingSubmit = false;
@@ -169,7 +186,7 @@ export class ProductDetailsComponent implements OnInit   {
     this.isLoadingDelete = true;
     const idToken = this.authService.getIdToken();
     const headers = { 'Authorization': idToken };
-    this.http.delete(`${this.baseUrl}comments/${this.product?.productId}`, { headers })
+    this.http.delete(`${this.chosenBaseUrl}comments/${this.product?.productId}`, { headers })
       .subscribe(
         (response: any) => {
           this.isLoadingDelete = false;
@@ -209,7 +226,7 @@ export class ProductDetailsComponent implements OnInit   {
   addToCart(): void {
     if (this.product) {
       this.isLoading = true;
-        const url = `${this.baseUrl}cart`;
+        const url = `${this.chosenBaseUrl}cart`;
         const headers = { 'Authorization': this.authService.getIdToken() };
         const body = { productId: this.product.productId, quantity: "1" };
         this.http.post(url, body, { headers }).subscribe({
