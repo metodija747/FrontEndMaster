@@ -20,17 +20,28 @@ export class OrdersDialogComponentComponent implements OnInit {
     private http: HttpClient,
     private authService: AuthService
   ) {}
-  baseUrl = `${this.authService.baseUrlServerless}`;
+  baseUrlServerless = `${this.authService.baseUrlServerless}`;
+  baseUrlMicroservice = `${this.authService.baseUrlMicroservice}`;
+  currentArchitecture = this.authService.getArchitecture();
+  chosenBaseUrl = this.currentArchitecture === 'Serverless' ? this.baseUrlServerless : this.baseUrlMicroservice;
   ngOnInit(): void {
     this.getOrders(this.page);
   }
 
   getOrders(page: number): void {
-    this.isLoading = true; // Add this line
-    this.page = page; // Add this line
+    this.isLoading = true;
+    this.page = page;
+    let url: string;
+    let headers = {};
     const idToken = this.authService.getIdToken();
-    const headers = { 'Authorization': idToken };
-    this.http.get(`${this.baseUrl}getOrders?page=${page}&pageSize=5`, { headers }).subscribe((response: any) => {
+    if (this.currentArchitecture === 'Serverless') {
+      url = `${this.chosenBaseUrl}getOrders?page=${page}&pageSize=5`;
+      headers = { 'Authorization': idToken };
+    } else {
+      url = `${this.chosenBaseUrl}orders?page=${page}&pageSize=5`;
+      headers = { 'Authorization': `Bearer ${idToken}` };
+    }
+    this.http.get(url, { headers }).subscribe((response: any) => {
       this.orders = response.orders;
       this.orders.forEach((order:any) => {
         order.isCollapsed = true;  // Add this line

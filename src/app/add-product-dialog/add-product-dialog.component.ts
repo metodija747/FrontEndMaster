@@ -23,6 +23,11 @@ export const priceDiscountValidator: ValidatorFn = (control: AbstractControl): {
   styleUrls: ['./add-product-dialog.component.css']
 })
 export class AddProductDialogComponent {
+  baseUrlServerless = `${this.authService.baseUrlServerless}`;
+  baseUrlMicroservice = `${this.authService.baseUrlMicroservice}`; // Assuming you have a baseUrlMicroservice in your AuthService
+  currentArchitecture = this.authService.getArchitecture();
+  chosenBaseUrl = this.currentArchitecture === 'Serverless' ? this.baseUrlServerless : this.baseUrlMicroservice;
+
   // Initiate addProductForm with FormBuilder
   addProductForm = this.fb.group({
     productName: ['', Validators.required],
@@ -70,10 +75,16 @@ export class AddProductDialogComponent {
   addProduct(): void {
     if (this.addProductForm.valid) {
       this.isAddLoading = true;
+      let url: string;
+      let headers = {};
       const idToken = this.authService.getIdToken();
-      const headers = { 'Authorization': idToken };
-
-      // Convert numerical values to strings
+      if (this.currentArchitecture === 'Serverless') {
+        url = `${this.chosenBaseUrl}catalog`;
+        headers = { 'Authorization': idToken };
+      } else {
+        url = `${this.chosenBaseUrl}products`;
+        headers = { 'Authorization': `Bearer ${idToken}` };
+      }
       const productData = {
         ...this.addProductForm.value,
         price: String(this.addProductForm.value.price),
@@ -82,7 +93,7 @@ export class AddProductDialogComponent {
       };
 
       console.log(productData);
-      this.http.post(`${this.baseUrl}catalog`, productData, {headers})
+      this.http.post(url, productData, {headers})
         .subscribe(
           response => {
             this.isAddLoading = false;

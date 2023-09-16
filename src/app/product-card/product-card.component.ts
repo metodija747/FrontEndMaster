@@ -18,53 +18,78 @@ export class ProductCardComponent implements OnInit  {
   @Input() product!: Product;
   averageRating = 0;
   isLoading = false;
-  isAdmin: Observable<boolean>; // Add isAdmin Observable
-  isDeleting = false; // Add this line at the top of your component
+  isAdmin: Observable<boolean>;
+  isDeleting = false;
 
   constructor(private http: HttpClient, public authService: AuthService, public dialog: MatDialog, private snackBar: MatSnackBar) {
     this.isAdmin = this.authService.isAdmin$; // subscribe to the isAdmin$ observable from AuthService
-
+    this.authService.architecture$.subscribe(
+      (architecture: string) => {
+        this.currentArchitecture = architecture;
+        this.chosenBaseUrl = this.currentArchitecture === 'Serverless' ? this.baseUrlServerless : this.baseUrlMicroservice;
+      },
+      (error: any) => {
+        console.error('Error fetching architecture:', error);
+      }
+    );
   }
-  baseUrl = `${this.authService.baseUrlServerless}`;
+
+
+
   ngOnInit(): void {
+    console.log('Current Architecture:', this.currentArchitecture);  // Debugging line
+    console.log('Chosen Base URL:', this.chosenBaseUrl);  // Debugging line
     this.averageRating = this.product.AverageRating;
   }
+  baseUrlServerless = `${this.authService.baseUrlServerless}`;
+  baseUrlMicroservice = `${this.authService.baseUrlMicroservice}`; // Assuming you have a baseUrlMicroservice in your AuthService
+  currentArchitecture = this.authService.getArchitecture();
+  chosenBaseUrl = this.currentArchitecture === 'Serverless' ? this.baseUrlServerless : this.baseUrlMicroservice;
 
-  addToCart(event: Event): void {
-    event.stopPropagation();
-    this.isLoading = true; // Set isLoading to true when the method is called
-    const url = `${this.baseUrl}cart`;  // <-- Replace with your actual API Gateway URL
-    const headers = { 'Authorization': this.authService.getIdToken() };
-    const body = { productId: this.product.productId, quantity: "1" };
-    this.http.post(url, body, { headers }).subscribe({
-      next: data => {
-        console.log(data);
-        this.isLoading = false; // Set isLoading to false when the request is completed
-        this.snackBar.open('Product added to cart successfully', 'Close', {
-          duration: 3000,
-          verticalPosition: 'bottom',
-          horizontalPosition: 'left'
-        });
-      },
-      error: error => {
-        console.log('There was an error!', error);
-        if (error.status === 500) {
-          this.authService.clearIdToken();
-          location.reload();
-        }
-        this.isLoading = false; // Set isLoading to false when an error occurs
-        this.snackBar.open('Error while adding to cart', 'Close', {
-          duration: 3000,
-          verticalPosition: 'bottom',
-          horizontalPosition: 'left'
-        });
+  addToCart(): void {
+    if (this.product) {
+      this.isLoading = true;
+      let url: string;
+      let headers = {};
+      const idToken = this.authService.getIdToken();
+      if (this.currentArchitecture === 'Serverless') {
+        url = `${this.chosenBaseUrl}cart`;
+        headers = { 'Authorization': idToken };
+      } else {
+        url = `${this.chosenBaseUrl}cart/add`;
+        headers = { 'Authorization': `Bearer ${idToken}` };
       }
-    });
-  }
+        const body = { productId: this.product.productId, quantity: "1" };
+        this.http.post(url, body, { headers }).subscribe({
+          next: data => {
+            console.log(data);
+            this.isLoading = false;
+            this.snackBar.open('Product added to cart successfully', 'Close', {
+              duration: 3000,
+              verticalPosition: 'bottom',
+              horizontalPosition: 'left'
+            });
+          },
+            error: error => {
+              this.isLoading = false;
+              this.snackBar.open('Error while adding to cart', 'Close', {
+                duration: 3000,
+                verticalPosition: 'bottom',
+                horizontalPosition: 'left'
+              });
+                console.log('There was an error!', error);
+                if ((error.status === 403) || (error.status === 401 && this.authService.getIdToken() !== null)) {
+                  this.authService.clearIdToken();
+                  location.reload();
+                }
+            }
+        });
+    }
+}
+
 
   openProductDetailsDialog(): void {
     console.log(this.product);
-
     const dialogRef = this.dialog.open(ProductDetailsComponent, {
       data: {
         product: this.product,
@@ -76,10 +101,18 @@ export class ProductCardComponent implements OnInit  {
     const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent);
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result) { // if the result is true (user clicked "Yes")
-        this.isDeleting = true; // Set isDeleting to true when delete operation starts
-        const url = `${this.baseUrl}catalog/${this.product.productId}`;
-        const headers = { 'Authorization': this.authService.getIdToken() };
+      if (result) {
+        this.isDeleting = true;
+        let url: string;
+        let headers = {};
+        const idToken = this.authService.getIdToken();
+        if (this.currentArchitecture === 'Serverless') {
+          url = `${this.chosenBaseUrl}catalog/${this.product.productId}`;
+          headers = { 'Authorization': idToken };
+        } else {
+          url = `${this.chosenBaseUrl}products/${this.product.productId}`;
+          headers = { 'Authorization': `Bearer ${idToken}` };
+        }
         this.http.delete(url, { headers }).subscribe({
           next: () => {
             this.isDeleting = false; // Set isDeleting to false when delete operation ends successfully

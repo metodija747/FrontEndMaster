@@ -24,7 +24,26 @@ export class ProductListComponent implements OnInit, OnChanges {
   currentRangeEnd: number = 0;
   totalProducts: number = 0;
 
-  constructor(private http: HttpClient, public authService: AuthService) { }
+  currentArchitecture: string | undefined;
+  chosenBaseUrl: string | undefined;
+  baseUrlServerless: string;
+  baseUrlMicroservice: string;
+
+  constructor(private http: HttpClient, public authService: AuthService) {
+    this.baseUrlServerless = `${this.authService.baseUrlServerless}`;
+    this.baseUrlMicroservice = `${this.authService.baseUrlMicroservice}`;
+
+    // Subscribe to the architecture observable
+    this.authService.architecture$.subscribe(
+      (architecture: string) => {
+        this.currentArchitecture = architecture;
+        this.chosenBaseUrl = this.currentArchitecture === 'Serverless' ? this.baseUrlServerless : this.baseUrlMicroservice;
+      },
+      (error: any) => {
+        console.error('Error fetching architecture:', error);
+      }
+    );
+  }
 
   ngOnInit(): void {
     this.getProducts();

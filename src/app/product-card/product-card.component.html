@@ -29,7 +29,7 @@
         <h6 class="text-success" style="font-size: 1.2em;">Free shipping</h6>
         <div class="d-flex flex-column mt-4">
           <button class="btn btn-sm" type="button" style="background-color: #8b4513; color: #fff;" (click)="openProductDetailsDialog()">DETAILS</button>
-          <button class="btn btn-outline-dark btn-sm mt-2 spinner-button" type="button" [class.disabled]="!authService.getIdToken()" (click)="addToCart($event)">
+          <button class="btn btn-outline-dark btn-sm mt-2 spinner-button" type="button" [class.disabled]="!authService.getIdToken()" (click)="addToCart()">
             <span *ngIf="!isLoading">ADD TO CART</span>
             <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
           </button>

@@ -42,11 +42,23 @@ export class CartDialogComponent implements OnInit {
   isLoading = false;
   isPayLoading = false;
 
-  constructor(private fb: FormBuilder, private snackBar: MatSnackBar, public dialogRef: MatDialogRef<CartDialogComponent>, private http: HttpClient, public authService: AuthService, private cdr: ChangeDetectorRef, public dialog: MatDialog) { }
+  constructor(private fb: FormBuilder, private snackBar: MatSnackBar, public dialogRef: MatDialogRef<CartDialogComponent>, private http: HttpClient, public authService: AuthService, private cdr: ChangeDetectorRef, public dialog: MatDialog) {    this.authService.architecture$.subscribe(
+    (architecture: string) => {
+      this.currentArchitecture = architecture;
+      this.chosenBaseUrl = this.currentArchitecture === 'Serverless' ? this.baseUrlServerless : this.baseUrlMicroservice;
+    },
+    (error: any) => {
+      console.error('Error fetching architecture:', error);
+    }
+  ); }
   ngOnInit(): void {
     this.loadCart();
   }
-  baseUrl = `${this.authService.baseUrlServerless}`;
+  baseUrlServerless = `${this.authService.baseUrlServerless}`;
+  baseUrlMicroservice = `${this.authService.baseUrlMicroservice}`;
+  currentArchitecture = this.authService.getArchitecture();
+  chosenBaseUrl = this.currentArchitecture === 'Serverless' ? this.baseUrlServerless : this.baseUrlMicroservice;
+
   openCheckoutForm() {
     this.showCheckoutForm = true;
     this.showCartView = false;
@@ -66,9 +78,17 @@ export class CartDialogComponent implements OnInit {
   // NEEDED FOR FILLING DATA AND PAYING
   checkout() {
     if (this.checkoutForm.valid) {
+    let url: string;
+    let headers = {};
     const idToken = this.authService.getIdToken();
-    const headers = { 'Authorization': idToken };
-    this.isPayLoading = true; // End loading
+    if (this.currentArchitecture === 'Serverless') {
+      url = `${this.chosenBaseUrl}checkout`;
+      headers = { 'Authorization': idToken };
+    } else {
+      url = `${this.chosenBaseUrl}orders`;
+      headers = { 'Authorization': `Bearer ${idToken}` };
+    }
+    this.isPayLoading = true;
     const orderList = this.products.map(product => ({productName: product.productName, quantity: product.quantity}));
     const body = {
       email: this.checkoutForm.get('email')?.value,
@@ -79,7 +99,7 @@ export class CartDialogComponent implements OnInit {
       orderList: JSON.stringify(orderList),
       totalPrice: this.TotalPrice
     };
-    this.http.post(`${this.baseUrl}checkout`, body, { headers }).subscribe((response: any) => {
+    this.http.post(url, body, { headers }).subscribe((response: any) => {
       // Handle the response
       console.log(response);
       this.showCheckoutForm = false;
@@ -99,7 +119,7 @@ export class CartDialogComponent implements OnInit {
         horizontalPosition: 'left'
       });
       this.isPayLoading = false; // End loading
-      if (error.status === 403) {
+      if ((error.status === 403) || (error.status === 401 && this.authService.getIdToken() !== null)) {
         this.authService.clearIdToken();
         location.reload();
       }
@@ -112,9 +132,14 @@ export class CartDialogComponent implements OnInit {
 loadCart(page: number = 1): void {
   this.currentPage = page;
   this.isLoading = true;
+  let headers = {};
   const idToken = this.authService.getIdToken();
-  const headers = { 'Authorization': idToken };
-  this.http.get(`${this.baseUrl}cart?page=${page}`, { headers }).subscribe((response: any) => {
+  if (this.currentArchitecture === 'Serverless') {
+    headers = { 'Authorization': idToken };
+  } else {
+    headers = { 'Authorization': `Bearer ${idToken}` };
+  }
+  this.http.get(`${this.chosenBaseUrl}cart?page=${page}`, { headers }).subscribe((response: any) => {
     console.log(response);
     this.products = response.products;
     this.pages = Array.from({ length: response.totalPages }, (_, i) => i + 1);
@@ -124,7 +149,7 @@ loadCart(page: number = 1): void {
   error => {
     console.error('There was an error!', error);
     this.isLoading = false;
-    if (error.status === 403) {
+    if ((error.status === 403) || (error.status === 401 && this.authService.getIdToken() !== null)) {
       this.authService.clearIdToken();
       location.reload();
     }
@@ -139,7 +164,14 @@ getProductsDetails(): void {
   this.products.forEach((product: any) => {
     const headers = { 'Authorization': "Bearer " + this.authService.getIdToken() };
     console.log(headers)
-    this.http.get(`${this.baseUrl}catalog/${product.productId}`, { headers }).subscribe((data: any) => {
+    let url: string;
+    const idToken = this.authService.getIdToken();
+    if (this.currentArchitecture === 'Serverless') {
+      url = `${this.chosenBaseUrl}catalog`;
+    } else {
+      url = `${this.chosenBaseUrl}products`;
+    }
+    this.http.get(`${url}/${product.productId}`, { headers }).subscribe((data: any) => {
       product.imageURL = data.imageURL;
       product.Price = data.Price;
       product.productName = data.productName;
@@ -151,10 +183,18 @@ getProductsDetails(): void {
 }
 
 updateQuantity(product: CartProduct): void {
-  product.isUpdatingQuantity = true; // Start loading
+  product.isUpdatingQuantity = true;
+  let url;
+  let headers = {};
   const idToken = this.authService.getIdToken();
-  const headers = { 'Authorization': idToken };
-  this.http.post(`${this.baseUrl}cart/`,
+  if (this.currentArchitecture === 'Serverless') {
+    url = `${this.chosenBaseUrl}cart`;
+    headers = { 'Authorization': idToken };
+  } else {
+    url = `${this.chosenBaseUrl}cart/add`;
+    headers = { 'Authorization': `Bearer ${idToken}` };
+  }
+  this.http.post(url,
     {productId: String(product.productId), quantity: String(product.quantity) },
     { headers }).subscribe((updatedItem: any) => {
       this.TotalPrice = Number(parseFloat(updatedItem.TotalPrice).toFixed(2));
@@ -162,7 +202,14 @@ updateQuantity(product: CartProduct): void {
       // Find the updated product in the products array and fetch its details
       const updatedProduct = this.products.find(p => p.productId === product.productId);
       if (updatedProduct) {
-        this.http.get(`${this.baseUrl}catalog/${updatedProduct.productId}`).subscribe((data: any) => {
+        let url: string;
+        if (this.currentArchitecture === 'Serverless') {
+          url = `${this.chosenBaseUrl}catalog`;
+          headers = { 'Authorization': idToken };
+        } else {
+          url = `${this.chosenBaseUrl}products`;
+        }
+        this.http.get(`${url}/${updatedProduct.productId}`).subscribe((data: any) => {
           updatedProduct.Price = data.Price;
           updatedProduct.totalProductPrice = parseFloat((Number(updatedProduct.quantity) * Number(updatedProduct.Price)).toFixed(2));
         });
@@ -171,7 +218,7 @@ updateQuantity(product: CartProduct): void {
     }, error => {
       console.error('There was an error!', error);
       product.isUpdatingQuantity = false; // End loading
-      if (error.status === 403) {
+      if ((error.status === 403) || (error.status === 401 && this.authService.getIdToken() !== null)) {
         this.authService.clearIdToken();
         location.reload();
       }});
@@ -181,9 +228,14 @@ deleteProduct(productId: string): void {
   const product = this.products.find(product => product.productId === productId);
   if (product) {
     product.isLoadingDelete = true;  // Start loading
+    let headers = {};
     const idToken = this.authService.getIdToken();
-    const headers = { 'Authorization': idToken };
-    this.http.delete(`${this.baseUrl}cart/${productId}`, { headers, observe: 'response' }).subscribe((response: any) => {
+    if (this.currentArchitecture === 'Serverless') {
+      headers = { 'Authorization': idToken };
+    } else {
+      headers = { 'Authorization': `Bearer ${idToken}` };
+    }
+    this.http.delete(`${this.chosenBaseUrl}cart/${productId}`, { headers, observe: 'response' }).subscribe((response: any) => {
       this.products = this.products.filter((product: any) => product.productId !== productId);
       const updatedCart = response.body;
       this.TotalPrice = Number(parseFloat(updatedCart.TotalPrice).toFixed(2));;
@@ -203,7 +255,7 @@ deleteProduct(productId: string): void {
         verticalPosition: 'bottom',
         horizontalPosition: 'left'
       });
-      if (error.status === 403) {
+      if ((error.status === 403) || (error.status === 401 && this.authService.getIdToken() !== null)) {
         this.authService.clearIdToken();
         location.reload();
       }

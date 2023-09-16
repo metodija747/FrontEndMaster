@@ -43,6 +43,10 @@ export class AuthDialogComponent implements OnInit {
   showPassword = false;
   showPassword2 = false;
   showPassword3 = false;
+  baseUrlServerless = `${this.authService.baseUrlServerless}`;
+  baseUrlMicroservice = `${this.authService.baseUrlMicroservice}`; // Assuming you have a baseUrlMicroservice in your AuthService
+  currentArchitecture = this.authService.getArchitecture();
+  chosenBaseUrl = this.currentArchitecture === 'Serverless' ? this.baseUrlServerless : this.baseUrlMicroservice;
 
 
   constructor(
@@ -52,18 +56,33 @@ export class AuthDialogComponent implements OnInit {
     private authService: AuthService, // inject the AuthService,
     private snackBar: MatSnackBar
 
-  ) {}
+  ) {
+    this.authService.architecture$.subscribe(
+      (architecture: string) => {
+        this.currentArchitecture = architecture;
+        this.chosenBaseUrl = this.currentArchitecture === 'Serverless' ? this.baseUrlServerless : this.baseUrlMicroservice;
+      },
+      (error: any) => {
+        console.error('Error fetching architecture:', error);
+      }
+    );
+  }
   ngOnInit() {
     this.state = this.data.state;
   }
-  baseUrl = `${this.authService.baseUrlServerless}`;
   onSignIn() {
     if (!this.email || !this.password || !this.isValidUsername(this.email) || !this.isValidPassword(this.password)) {
       this.errorMessage = 'Invalid email';
       return;
     }
     this.isLoading = true;
-    this.http.post<any>(`${this.baseUrl}sign-in`, {
+    let url: string;
+    if (this.currentArchitecture === 'Serverless') {
+      url = `${this.chosenBaseUrl}sign-in`;
+    } else {
+      url = `${this.chosenBaseUrl}authorization/login`;
+    }
+    this.http.post<any>(url, {
       email: this.email,
       password: this.password
     }).pipe(
@@ -110,9 +129,14 @@ export class AuthDialogComponent implements OnInit {
       this.errorMessage = 'Passwords are not the same.';
       return;
     }
-
+    let url: string;
+    if (this.currentArchitecture === 'Serverless') {
+      url = `${this.chosenBaseUrl}sign-up`;
+    } else {
+      url = `${this.chosenBaseUrl}authorization/register`;
+    }
     this.isLoading = true;
-    this.http.post(`${this.baseUrl}sign-up`, {
+    this.http.post(url, {
       email: this.email,
       password: this.password
     }).pipe(
@@ -145,9 +169,15 @@ export class AuthDialogComponent implements OnInit {
     }
     event.preventDefault();
     this.isLoading = true;
-    this.http.post(`${this.baseUrl}forgot-password`, {
+    let url: string;
+    if (this.currentArchitecture === 'Serverless') {
+      url = `${this.chosenBaseUrl}forgot-password`;
+    } else {
+      url = `${this.chosenBaseUrl}authorization/forgot-password?email=${this.email}`;
+    }
+    this.http.post(url,  {
       email: this.email
-    }).pipe(
+    }, { responseType: 'text' }).pipe(
       catchError(error => {
         console.error('There was an error during the forgot password process', error);
         this.errorMessage = error.error; // Set the error message
@@ -169,11 +199,17 @@ export class AuthDialogComponent implements OnInit {
 
   onConfirmForgotPassword() {
     this.isLoading = true;
-    this.http.post(`${this.baseUrl}confirm-forgot-password`, {
+    let url: string;
+    if (this.currentArchitecture === 'Serverless') {
+      url = `${this.chosenBaseUrl}confirm-forgot-password`;
+    } else {
+      url = `${this.chosenBaseUrl}authorization/confirm-forgot-password`;
+    }
+    this.http.post(url, {
       email: this.email,
       confirmationCode: this.confirmationCode,
       newPassword: this.password
-    }).pipe(
+    }, { responseType: 'text' }).pipe(
       catchError(error => {
         console.error('There was an error during the confirm forgot password process', error);
         this.isLoading = false;
@@ -200,8 +236,17 @@ export class AuthDialogComponent implements OnInit {
       return;
     }
     this.isLoading = true;
-    const headers = new HttpHeaders().set('Authorization', this.authService.getIdToken());
-    this.http.delete(`${this.baseUrl}users/${this.email}`, { headers, observe: 'response' }).pipe(
+    let url: string;
+    let headers = {};
+    const idToken = this.authService.getIdToken();
+    if (this.currentArchitecture === 'Serverless') {
+      url = `${this.chosenBaseUrl}users/${this.email}`;
+      headers = { 'Authorization': idToken };
+    } else {
+      url = `${this.chosenBaseUrl}authorization/delete?email=${this.email}`;
+      headers = { 'Authorization': `Bearer ${idToken}` };
+    }
+    this.http.delete(url, { headers, observe: 'response', responseType: 'text' }).pipe(
       catchError((error: HttpErrorResponse) => {
         console.error('There was an error during the delete account process', error);
         if (error.status === 400 && error.error.includes('Failed to delete user because it does not exist.')) {

@@ -32,6 +32,15 @@ export class ProductDetailsComponent implements OnInit   {
     private cdr: ChangeDetectorRef,
     private dialog: MatDialog,
   ) {
+    this.authService.architecture$.subscribe(
+      (architecture: string) => {
+        this.currentArchitecture = architecture;
+        this.chosenBaseUrl = this.currentArchitecture === 'Serverless' ? this.baseUrlServerless : this.baseUrlMicroservice;
+      },
+      (error: any) => {
+        console.error('Error fetching architecture:', error);
+      }
+    );
     this.product = data.product;
     this.showAddToCart = data.showAddToCart;
   }
@@ -139,7 +148,12 @@ export class ProductDetailsComponent implements OnInit   {
     if (this.product) {
       this.isLoadingSubmit = true;
       const idToken = this.authService.getIdToken();
-      const headers = { 'Authorization': idToken };
+      let headers = {};
+      if (this.currentArchitecture === 'Serverless') {
+        headers = { 'Authorization': idToken };
+      } else {
+        headers = { 'Authorization': `Bearer ${idToken}` };
+      }
       const commentData = {
         comment: String(this.newComment.text),
         productId: String(this.product.productId),
@@ -173,7 +187,7 @@ export class ProductDetailsComponent implements OnInit   {
             verticalPosition: 'bottom',
             horizontalPosition: 'left'
           });
-          if (error.status === 500) {
+          if ((error.status === 403) || (error.status === 401 && this.authService.getIdToken() !== null)) {
             this.authService.clearIdToken();
             location.reload();
           }
@@ -185,7 +199,12 @@ export class ProductDetailsComponent implements OnInit   {
   deleteComment(comment: any): void {
     this.isLoadingDelete = true;
     const idToken = this.authService.getIdToken();
-    const headers = { 'Authorization': idToken };
+    let headers = {};
+    if (this.currentArchitecture === 'Serverless') {
+      headers = { 'Authorization': idToken };
+    } else {
+      headers = { 'Authorization': `Bearer ${idToken}` };
+    }
     this.http.delete(`${this.chosenBaseUrl}comments/${this.product?.productId}`, { headers })
       .subscribe(
         (response: any) => {
@@ -213,7 +232,7 @@ export class ProductDetailsComponent implements OnInit   {
             verticalPosition: 'bottom',
             horizontalPosition: 'left'
           });
-          if (error.status === 500) {
+          if ((error.status === 403) || (error.status === 401 && this.authService.getIdToken() !== null)) {
             this.authService.clearIdToken();
             location.reload();
           }
@@ -225,9 +244,17 @@ export class ProductDetailsComponent implements OnInit   {
 
   addToCart(): void {
     if (this.product) {
-      this.isLoading = true;
-        const url = `${this.chosenBaseUrl}cart`;
-        const headers = { 'Authorization': this.authService.getIdToken() };
+        this.isLoading = true;
+        let url: string;
+        let headers = {};
+        const idToken = this.authService.getIdToken();
+        if (this.currentArchitecture === 'Serverless') {
+          url = `${this.chosenBaseUrl}cart`;
+          headers = { 'Authorization': idToken };
+        } else {
+          url = `${this.chosenBaseUrl}cart/add`;
+          headers = { 'Authorization': `Bearer ${idToken}` };
+        }
         const body = { productId: this.product.productId, quantity: "1" };
         this.http.post(url, body, { headers }).subscribe({
           next: data => {
@@ -247,9 +274,9 @@ export class ProductDetailsComponent implements OnInit   {
                 horizontalPosition: 'left'
               });
                 console.log('There was an error!', error);
-                if (error.status === 500) {
-                    this.authService.clearIdToken();
-                    location.reload();
+                if ((error.status === 403) || (error.status === 401 && this.authService.getIdToken() !== null)) {
+                  this.authService.clearIdToken();
+                  location.reload();
                 }
             }
         });
