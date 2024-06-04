@@ -35,8 +35,8 @@ export class OrdersDialogComponentComponent implements OnInit {
     let headers = {};
     const idToken = this.authService.getIdToken();
     if (this.currentArchitecture === 'Serverless') {
-      url = `${this.chosenBaseUrl}getOrders?page=${page}&pageSize=5`;
-      headers = { 'Authorization': idToken };
+      url = `${this.chosenBaseUrl}orders?page=${page}&pageSize=5`;
+      headers = { 'Authorization': `Bearer ${idToken}` };
     } else {
       url = `${this.chosenBaseUrl}orders?page=${page}&pageSize=5`;
       headers = { 'Authorization': `Bearer ${idToken}` };

@@ -134,12 +134,14 @@ loadCart(page: number = 1): void {
   this.isLoading = true;
   let headers = {};
   const idToken = this.authService.getIdToken();
-  if (this.currentArchitecture === 'Serverless') {
-    headers = { 'Authorization': idToken };
-  } else {
-    headers = { 'Authorization': `Bearer ${idToken}` };
-  }
-  this.http.get(`${this.chosenBaseUrl}cart?page=${page}`, { headers }).subscribe((response: any) => {
+  // if (this.currentArchitecture === 'Serverless') {
+  //   headers = { 'Authorization': idToken };
+  // } else {
+  //   headers = { 'Authorization': `Bearer ${idToken}` };
+  // }
+  // this.http.get(`${this.chosenBaseUrl}cart?page=${page}`, { headers }).subscribe((response: any) => {
+  this.http.get(`https://sjmdwpko0k.execute-api.us-east-1.amazonaws.com/Prod/cart?page=${page}`).subscribe((response: any) => {
+
     console.log(response);
     this.products = response.products;
     this.pages = Array.from({ length: response.totalPages }, (_, i) => i + 1);
@@ -173,7 +175,7 @@ getProductsDetails(): void {
     }
     this.http.get(`${url}/${product.productId}`, { headers }).subscribe((data: any) => {
       product.imageURL = data.imageURL;
-      product.Price = data.Price;
+      product.Price = data.discountPrice;
       product.productName = data.productName;
       product.totalProductPrice = parseFloat((product.quantity * product.Price).toFixed(2));
       console.log(product)

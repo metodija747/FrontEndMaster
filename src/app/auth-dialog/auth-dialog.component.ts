@@ -78,7 +78,7 @@ export class AuthDialogComponent implements OnInit {
     this.isLoading = true;
     let url: string;
     if (this.currentArchitecture === 'Serverless') {
-      url = `${this.chosenBaseUrl}sign-in`;
+      url = `${this.chosenBaseUrl}authorization/login`;
     } else {
       url = `${this.chosenBaseUrl}authorization/login`;
     }
@@ -131,7 +131,7 @@ export class AuthDialogComponent implements OnInit {
     }
     let url: string;
     if (this.currentArchitecture === 'Serverless') {
-      url = `${this.chosenBaseUrl}sign-up`;
+      url = `${this.chosenBaseUrl}authorization/register`;
     } else {
       url = `${this.chosenBaseUrl}authorization/register`;
     }
