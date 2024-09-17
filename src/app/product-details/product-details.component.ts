@@ -150,7 +150,7 @@ export class ProductDetailsComponent implements OnInit   {
       const idToken = this.authService.getIdToken();
       let headers = {};
       if (this.currentArchitecture === 'Serverless') {
-        headers = { 'Authorization': idToken };
+        headers = { 'Authorization': `Bearer ${idToken}` };
       } else {
         headers = { 'Authorization': `Bearer ${idToken}` };
       }
@@ -201,7 +201,7 @@ export class ProductDetailsComponent implements OnInit   {
     const idToken = this.authService.getIdToken();
     let headers = {};
     if (this.currentArchitecture === 'Serverless') {
-      headers = { 'Authorization': idToken };
+      headers = { 'Authorization': `Bearer ${idToken}` };
     } else {
       headers = { 'Authorization': `Bearer ${idToken}` };
     }
@@ -250,7 +250,7 @@ export class ProductDetailsComponent implements OnInit   {
         const idToken = this.authService.getIdToken();
         if (this.currentArchitecture === 'Serverless') {
           url = `${this.chosenBaseUrl}cart`;
-          headers = { 'Authorization': idToken };
+          headers = { 'Authorization': `Bearer ${idToken}` };
         } else {
           url = `${this.chosenBaseUrl}cart/add`;
           headers = { 'Authorization': `Bearer ${idToken}` };

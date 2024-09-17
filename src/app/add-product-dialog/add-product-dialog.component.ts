@@ -24,7 +24,7 @@ export const priceDiscountValidator: ValidatorFn = (control: AbstractControl): {
 })
 export class AddProductDialogComponent {
   baseUrlServerless = `${this.authService.baseUrlServerless}`;
-  baseUrlMicroservice = `${this.authService.baseUrlMicroservice}`; // Assuming you have a baseUrlMicroservice in your AuthService
+  baseUrlMicroservice = `${this.authService.baseUrlMicroservice}`;
   currentArchitecture = this.authService.getArchitecture();
   chosenBaseUrl = this.currentArchitecture === 'Serverless' ? this.baseUrlServerless : this.baseUrlMicroservice;
 
@@ -80,7 +80,7 @@ export class AddProductDialogComponent {
       const idToken = this.authService.getIdToken();
       if (this.currentArchitecture === 'Serverless') {
         url = `${this.chosenBaseUrl}catalog`;
-        headers = { 'Authorization': idToken };
+        headers = { 'Authorization': `Bearer ${idToken}` };
       } else {
         url = `${this.chosenBaseUrl}products`;
         headers = { 'Authorization': `Bearer ${idToken}` };
@@ -115,7 +115,7 @@ export class AddProductDialogComponent {
               verticalPosition: 'bottom',
               horizontalPosition: 'left'
             });
-            if (error.status === 500) {
+            if (error.status === 403 || error.status === 401) {
               this.authService.clearIdToken();
             }
           }

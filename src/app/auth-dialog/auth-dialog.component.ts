@@ -180,7 +180,7 @@ export class AuthDialogComponent implements OnInit {
     }, { responseType: 'text' }).pipe(
       catchError(error => {
         console.error('There was an error during the forgot password process', error);
-        this.errorMessage = error.error; // Set the error message
+        this.errorMessage = error.error;
         this.isLoading = false;
         return throwError(error);
       })
@@ -193,7 +193,7 @@ export class AuthDialogComponent implements OnInit {
       });
       this.state = AuthDialogState.ConfirmForgotPassword;
       this.isLoading = false;
-      this.errorMessage = ''; // Clear the error message on success
+      this.errorMessage = '';
     });
   }
 
@@ -241,6 +241,7 @@ export class AuthDialogComponent implements OnInit {
     const idToken = this.authService.getIdToken();
     if (this.currentArchitecture === 'Serverless') {
       url = `${this.chosenBaseUrl}users/${this.email}`;
+      console.log(url);
       headers = { 'Authorization': idToken };
     } else {
       url = `${this.chosenBaseUrl}authorization/delete?email=${this.email}`;

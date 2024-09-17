@@ -54,7 +54,7 @@ export class ProductCardComponent implements OnInit  {
       const idToken = this.authService.getIdToken();
       if (this.currentArchitecture === 'Serverless') {
         url = `${this.chosenBaseUrl}cart`;
-        headers = { 'Authorization': idToken };
+        headers = { 'Authorization': `Bearer ${idToken}` };
       } else {
         url = `${this.chosenBaseUrl}cart/add`;
         headers = { 'Authorization': `Bearer ${idToken}` };
@@ -108,7 +108,7 @@ export class ProductCardComponent implements OnInit  {
         const idToken = this.authService.getIdToken();
         if (this.currentArchitecture === 'Serverless') {
           url = `${this.chosenBaseUrl}catalog/${this.product.productId}`;
-          headers = { 'Authorization': idToken };
+          headers = { 'Authorization': `Bearer ${idToken}` };
         } else {
           url = `${this.chosenBaseUrl}products/${this.product.productId}`;
           headers = { 'Authorization': `Bearer ${idToken}` };

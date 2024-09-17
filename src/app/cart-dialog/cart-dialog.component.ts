@@ -83,7 +83,7 @@ export class CartDialogComponent implements OnInit {
     const idToken = this.authService.getIdToken();
     if (this.currentArchitecture === 'Serverless') {
       url = `${this.chosenBaseUrl}checkout`;
-      headers = { 'Authorization': idToken };
+      headers = { 'Authorization': `Bearer ${idToken}` };
     } else {
       url = `${this.chosenBaseUrl}orders`;
       headers = { 'Authorization': `Bearer ${idToken}` };
@@ -134,13 +134,13 @@ loadCart(page: number = 1): void {
   this.isLoading = true;
   let headers = {};
   const idToken = this.authService.getIdToken();
-  // if (this.currentArchitecture === 'Serverless') {
-  //   headers = { 'Authorization': idToken };
-  // } else {
-  //   headers = { 'Authorization': `Bearer ${idToken}` };
-  // }
-  // this.http.get(`${this.chosenBaseUrl}cart?page=${page}`, { headers }).subscribe((response: any) => {
-  this.http.get(`https://sjmdwpko0k.execute-api.us-east-1.amazonaws.com/Prod/cart?page=${page}`).subscribe((response: any) => {
+  if (this.currentArchitecture === 'Serverless') {
+    headers = { 'Authorization': `Bearer ${idToken}` };
+  } else {
+    headers = { 'Authorization': `Bearer ${idToken}` };
+  }
+  this.http.get(`${this.chosenBaseUrl}cart?page=${page}`, { headers }).subscribe((response: any) => {
+  // this.http.get(`https://sjmdwpko0k.execute-api.us-east-1.amazonaws.com/Prod/cart?page=${page}`).subscribe((response: any) => {
 
     console.log(response);
     this.products = response.products;
@@ -164,8 +164,8 @@ getProductsDetails(): void {
     return;
   }
   this.products.forEach((product: any) => {
-    const headers = { 'Authorization': "Bearer " + this.authService.getIdToken() };
-    console.log(headers)
+    // const headers = { 'Authorization': "Bearer " + this.authService.getIdToken() };
+    // console.log(headers)
     let url: string;
     const idToken = this.authService.getIdToken();
     if (this.currentArchitecture === 'Serverless') {
@@ -173,7 +173,7 @@ getProductsDetails(): void {
     } else {
       url = `${this.chosenBaseUrl}products`;
     }
-    this.http.get(`${url}/${product.productId}`, { headers }).subscribe((data: any) => {
+    this.http.get(`${url}/${product.productId}`).subscribe((data: any) => {
       product.imageURL = data.imageURL;
       product.Price = data.discountPrice;
       product.productName = data.productName;
@@ -189,41 +189,53 @@ updateQuantity(product: CartProduct): void {
   let url;
   let headers = {};
   const idToken = this.authService.getIdToken();
+
+  // Set URL based on the architecture
   if (this.currentArchitecture === 'Serverless') {
     url = `${this.chosenBaseUrl}cart`;
-    headers = { 'Authorization': idToken };
+    headers = { 'Authorization': `Bearer ${idToken}` };
   } else {
     url = `${this.chosenBaseUrl}cart/add`;
     headers = { 'Authorization': `Bearer ${idToken}` };
   }
-  this.http.post(url,
-    {productId: String(product.productId), quantity: String(product.quantity) },
-    { headers }).subscribe((updatedItem: any) => {
-      this.TotalPrice = Number(parseFloat(updatedItem.TotalPrice).toFixed(2));
-      product.isUpdatingQuantity = false; // End loading
-      // Find the updated product in the products array and fetch its details
+
+  // Make the API request to update the quantity
+  this.http.post(url, { productId: String(product.productId), quantity: String(product.quantity) }, { headers })
+    .subscribe((updatedItem: any) => {
+      product.isUpdatingQuantity = false; // End loading state
+
+      // Find the updated product in the products array
       const updatedProduct = this.products.find(p => p.productId === product.productId);
       if (updatedProduct) {
-        let url: string;
-        if (this.currentArchitecture === 'Serverless') {
-          url = `${this.chosenBaseUrl}catalog`;
-          headers = { 'Authorization': idToken };
-        } else {
-          url = `${this.chosenBaseUrl}products`;
-        }
-        this.http.get(`${url}/${updatedProduct.productId}`).subscribe((data: any) => {
-          updatedProduct.Price = data.Price;
-          updatedProduct.totalProductPrice = parseFloat((Number(updatedProduct.quantity) * Number(updatedProduct.Price)).toFixed(2));
+        // Fetch the updated product details (price, etc.)
+        let productDetailsUrl = this.currentArchitecture === 'Serverless'
+                                ? `${this.chosenBaseUrl}catalog/${updatedProduct.productId}`
+                                : `${this.chosenBaseUrl}products/${updatedProduct.productId}`;
+
+        this.http.get(productDetailsUrl).subscribe((data: any) => {
+          // Ensure to use discountPrice for calculations
+          updatedProduct.discountPrice = data.discountPrice; // Set the discount price from the API response
+          updatedProduct.totalProductPrice = parseFloat((Number(updatedProduct.quantity) * Number(updatedProduct.discountPrice)).toFixed(2));
+
+          // Recalculate the total price after updating the product details
+          this.updateTotalPrice();
         });
+      } else {
+        // If the product was not found, still update the total price as a precaution
+        this.updateTotalPrice();
       }
-      this.cdr.detectChanges();
+
+      this.cdr.detectChanges(); // Trigger change detection
     }, error => {
       console.error('There was an error!', error);
-      product.isUpdatingQuantity = false; // End loading
+      product.isUpdatingQuantity = false; // End loading state
+
+      // Handle authorization errors by clearing tokens and reloading
       if ((error.status === 403) || (error.status === 401 && this.authService.getIdToken() !== null)) {
         this.authService.clearIdToken();
         location.reload();
-      }});
+      }
+    });
 }
 
 deleteProduct(productId: string): void {
@@ -233,7 +245,7 @@ deleteProduct(productId: string): void {
     let headers = {};
     const idToken = this.authService.getIdToken();
     if (this.currentArchitecture === 'Serverless') {
-      headers = { 'Authorization': idToken };
+      headers = { 'Authorization': `Bearer ${idToken}` };
     } else {
       headers = { 'Authorization': `Bearer ${idToken}` };
     }
@@ -284,4 +296,11 @@ decreaseQuantity(product: CartProduct): void {
     this.updateQuantity(product);
   }
 }
+
+updateTotalPrice(): void {
+  this.TotalPrice = this.products.reduce((acc, product) => acc + product.totalProductPrice, 0);
+  this.TotalPrice = Number(this.TotalPrice.toFixed(2));
 }
+
+}
+
