@@ -9,7 +9,7 @@ export class AuthService {
   readonly baseUrlMicroservice = 'http://20.231.233.217/';
   private idTokenSubject = new BehaviorSubject<string>(localStorage.getItem('idToken') || '');
   private isAdminSubject = new BehaviorSubject<boolean>(JSON.parse(localStorage.getItem('isAdmin') || 'false'));
-  private architectureSubject = new BehaviorSubject<string>('Serverless'); // Default value is 'Serverless'
+  private architectureSubject = new BehaviorSubject<string>('Serverless');
 
   idToken$ = this.idTokenSubject.asObservable();
   isAdmin$ = this.isAdminSubject.asObservable();
