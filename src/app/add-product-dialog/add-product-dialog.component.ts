@@ -37,7 +37,7 @@ export class AddProductDialogComponent {
     description: ['', Validators.required],
     beautifulComment: ['', Validators.required],
     discountPrice: ['']
-  }, { validators: priceDiscountValidator });  // Add the custom validator here
+  }, { validators: priceDiscountValidator });  // Add the   custom validator here
   baseUrl = `${this.authService.baseUrlServerless}`;
   constructor(
     public dialogRef: MatDialogRef<AddProductDialogComponent>,
